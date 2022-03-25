@@ -1,0 +1,30 @@
+spring:
+  liquibase:
+    change-log: classpath:liquibase/changelog-test.yml
+    contexts: test
+    enabled: false
+    parameters:
+      NLS_TIMESTAMP_FORMAT: yyyy-MM-dd hh24:mi:ss.ff
+      textColumnType: VARCHAR(250)
+  datasource:
+    url: ${DB_URL}
+    username: test
+    password: password
+    container:
+      image: '?'
+      reuse: false
+    v1:
+      username: test
+      password: password
+#server:
+#  port: 9080
+#test:
+#  server:
+#    port: 9080
+#---
+#spring:
+#  config.activate.on-profile: test
+#  liquibase:
+#    parameters:
+#      NLS_TIMESTAMP_FORMAT: blah
+#      textColumnType: TEXT

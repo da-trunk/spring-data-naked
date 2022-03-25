@@ -5,17 +5,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.datrunk.naked</groupId>
-	<artifactId>parent</artifactId>
+	<artifactId>aggregator</artifactId>
 	<packaging>pom</packaging>
 	<version>0.1-SNAPSHOT</version>
 	<modules>
+    <module>sdn-parent</module>
 		<module>entities</module>
 		<module>server</module>
 		<module>client</module>
 		<module>test-client</module>
 		<module>test-server</module>
 		<module>test-entities</module>
+		<module>test-db-oracle</module>
+		<module>test-db-h2</module>
 	</modules>
-
-
 </project>

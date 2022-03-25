@@ -1,0 +1,103 @@
+# ER Diagram
+
+<object data="erDiagram.pdf" type="application/pdf" width="100%">
+    <embed src="docs/erDiagram.pdf">
+        <p>This browser does not support PDFs.</p>
+    </embed>
+</object>
+
+# Generating Liquibase Changesets
+
+## Generating Schema in Docker
+
+  * Start an empty docker DB
+    1. Login: `docker login ? -u <your id>`
+    1. Pull image: `docker pull <image>`
+    1. Start container: `docker run --shm-size=1g --name test-db-oracle -p 1521:1521 -e ORACLE_SID=oracle -e ORACLE_PDB=oracle -e ORACLE_PWD=password <image>`
+  * Generate change sets from the entities: `mvn liquibase:diff`
+  * Deploy change sets to the empty db: `mvn liquibase:update`
+  * Connect SQL Developer to `localhost`, port `1521`, service name `XE`.
+
+# Entity Architecture
+
+## Limitations and workarounds
+
+While creating this, I've run into limitations which have influenced my architecture. I started noting them here. This same document includes my design goals. This section only documents the technical goals and design decisions.
+
+  * Requirements of an entity which is exposed as a resource in the client and server:
+    * The following class-level annotations are required:
+      * `@Entity`
+      * `@NoArgsConstructor(access = AccessLevel.PROTECTED)`
+      * `@Getter`
+      * `@Setter`
+      * `@RemoteResource("/collectionsPath")`
+    * It should extend `IdClass<ID>`.  By doing this, it gets the following.
+      * A persistent-friendly `equals` and `hashCode`.
+      * A `getUri` and `setUri` method.
+      * Implements `WithId<ID>` so that both client and server can populate DB-generated identifiers after creation.  Also, the server uses this when building links for any referenced lazy-loaded proxies in the JSON response from a batch insert or update.
+      * Implements `WithUri` so that the client can set the URI from the location header after a POST request.
+    * It should include a single field: `private ID @Id id;`.  At present, ID must be either single `String` or `Long`.  This is due to code in spring-data-rest, `RepoClient`, and `BatchRestRepo` which converts ID to and from URLs.  Those conversions are currently not equipped to handle composite keys or types other than `Long` and `String`.  TODO: Spring provides a hook for implementing custom id-to-string converters for each type.  These can be used by spring-data-rest's translation logic between Entity and URI.  We should leverage that to support composite and complex keys.
+    * Lazy loaded fields referencing other entities should be annotated `@Getter(onMethod_ = { @LinkedResource })`.  This ensures the client will serialize them as HTTP links.  It is very important to be consistent here, as I have seen error "Session closed" when Spring builds the JSON response from an EntityModel including a hibernate proxy if fields it requires in the JSON response have not been initialized.  Initialization is likely to not occur properly when the entity is inconsistent regarding client-side and server-side lazy versus eager loading annotations.
+    * Eager loaded fields referencing other entities should be annotated `@Getter(onMethod_ = { @JsonDeserialize(contentUsing = InlineAssociationDeserializer.class) })`.  This ensures they are embedded into JSON payloads sent from the client or returned from the server.
+  * Clients:
+    * Use `RepoClient.Factory` to create a client instance for your entity.  This gives you `save`, `saveAll`, `delete`, `deleteAll`, `update`, `get`, and `getAll`.  You may want to define a `@Bean` method for each `RepoClient<T, ID>` so that you can inject them.
+  * Testing:
+    * When testing from the client, be sure to wrap your logic in a try-catch and delete anything you modified in the DB.  TODO: we should create a helper to track what was created.
+  * Triggers: these can be nasty as they can modify the DB in ways that are invisible to the client and server.  When persisting an entity to a DB table with a trigger, you will need to **follow that with a get request for any entities may have been touched by DB triggers**.  This is not necessary for the DB-generated identifiers, as the framework will handle them for you.
+  * **When merging or updating an entity server-side, always update your reference with the argument returned by merge**.  In addition, you must **update any copies which are still in use**.  Merge returns a new copy of the entity.  The old copy is no longer valid.  You should also do this client side, as all client save and update methods will return the value after persisting or updating it.  But it is less important in the client as there are really only two possible scenarios when triggers aren't involved (on failure, the transaction is rolled back so nothing is changed.  On success, the DB should always match what the client provided).
+  * When calling `save`, replace the client's reference to that entity with the returned value.  This is mainly because `save` can invoke a `merge` when it is executed server-side.  This is done to avoid failures if the entity has already been persisted.  Client-side, this is less important as we attempt to update the entity in-place even when doing a `save`.
+  * If you know you want to create a new entity, call `persist`.  Unlike `save`, it will throw an exception if the entity's identifier is not db-generated and that identifier already exists in the DB.  Also, it will fail if a unique unique constraint is violated when attempting to create a new entity.  When it succeeds, the provided entity is updated in place (instead of returning a new copy).  This is much friendlier when other objects have references to that entity.
+  * In DDL, *Hibernate* always orders fields and columns alphabetically.  There is no way to influence this.  For that reason, this project relies on generated DDL only during development.  This is done by developing and testing against a local dockerized DB.  When deploying to production, we use entity-to-DB diff'ing (via Liquibase) to create migrations for the required changes.  We manually edit the generated migrations to achieve a column ordering in the DB which matches the field ordering in our entities.
+  * *Hibernate* imposes many restrictions on entity fields.  They must be mutable (i.e., they cannot be final) and they must include a getter and setter method with at least protected access.  In addition, they require a no argument constructor with at least protected access.  These are used by *proxy* class implementations which *Hibernate* creates when loading or copying data.  To hide these implementation details as much as possible, this project uses *Lombok* annotations.
+    * Collection fields must also be mutable.  For this reason, I've implemented add and addAll methods for initialization of collection fields.  The `@Entity` still requires a collection setter (for *Hibernate* to use when loading or copying values from the DB).  Access on that setter is protected to avoid misuse.
+  * Entities override `equals` and `hashcode` to include only the `@Id` field.  This ensures entities with equal primary key are assigned to the same slot in Sets and Maps.  In other words, it ensures objects are considered equal in our code if they would be considered equal in the DB.  
+    * `IdClass<ID>`: Unfortunately, some newly created types use identifiers managed by the DB.  These entities cannot know their id value until after they are persisted, so their id is initialized to `null`.  These entities extend class `IdClass<ID>`.  It overrides `equals` and `hashcode` so that the id is a factor in the comparison only if it is non-null.  When the id is `null` , it is excluded from the comparison or hash and all other fields are instead included.  In this case, the comparison and hashing is done via reflection.  
+    * `WithId<ID>`: When an entity's id can be assigned by the code (a natural key), it may implement interface `WithId<ID>` directly.
+    * Sometimes, an entity has a db-generated id and a second natural id.  Ideally, we'd find a way to suppress and remove the db-generated id, but I haven't found a way to accomplish that.
+  * **EntityNotFoundException**: this is common when persisting an object.  Dependent objects must be persisted first.  The chain of dependencies may be long and complex.  Cascading is one solution to this.  Cascading should always be one-way so that it doesn't result in a cycle.  An alternative to cascading is to provide methods in the code for persisting objects in the correct order.  See `PersistanceHelper` for an example of this second approach.  Unfortunately, both approaches runs into complexities.  No single approach works in every case.  Cascading can define only a single approach while methods can implement multiple approaches.  In general, as things evolve, I think cascading gets in the way and special-purpose persistence methods begin to proliferate.  We need to develop better strategies here.
+    * These scenarios are often obfuscated by a one-sided error message.  For example, `Consumer` is the unsaved dependent object in the error message `org.hibernate.TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing: org.datrunk.naked.entities.jpa.source.entity.Consumer`.  To fix this, look for an `Entity` which depends on `Consumer` and has been persisted (i.e., `em.persist(consumer)` or `consumerRepo.save()` has been called).  The error occurs when an attempt to `flush` is made, so you must search code executed before that flush.  Repositories generally share a single `EntityManager`, so the missing save may be on a separate repository than the repository which issued the failing flush.  For example, you might have persisted all the `Consumer` references associated with `VdiExTask` instances and you might even be flushing a `VdiExTaskRepo`.  But, the problem could be a call to `MillExTaskRepo::save`, as `MillExTask` might reference a `Consumer` that hasn't been saved.
+    * When debugging these, it is useful to add flush statements immediately after persisting a possible violator.
+    * When using cascading to solve this, it is important to cascade both `CascadeType.PERSIST` and  `CascadeType.MERGE`.  This covers both operations that a `JpaRepository.save` can invoke.  With this, Hibernate will invoke `EntityManager::persist` and `EntityManager::merge` on the target entity of an association after invoking the same operation on the dependent entity.  
+    * If saving to tables with triggers which operate on other tables, it is important to call `EntityManager::refresh` after saving.  This triggers Hibernate to run select queries to sync it and its dependencies from the database after persisting or merging that entity.  Also, your repository should inherit from `BaseRepository` instead of `JpaRepository`.  In addition, you should `Cascade.REFRESH` whenever you cascade persist and merge.
+    * Too much cascading can lead to a circular dependency.  Hibernate is able to detect and automatically break cycles when persisting, merging, or refreshing.  But, I think it struggles with remove (deleting).  So, it's best to avoid a `Cascade.ALL` from both sides when a pair of entities depend on each other.  Also, ObjectMapper's JSON (de)serialization and Lombok's `toString` are unable to detect cycles and will fail with a **StackOverflow** error if you do not include annotations which break these cycles by excluding certain fields.
+  * **DataIntegrityViolationException**: 
+    * If you see something like `javax.persistence.EntityExistsException: A different object with the same identifier value was already associated with the session : [org.datrunk.naked.entities.jpa.source.entity.Zone#emea-1-zone1]`, then check to make sure you reassigned your entity variable after any calls to `save`, `saveAll`, `saveAndFlush`, or `merge`.  This is necessary because these calls will execute `EntityManager::merge` if Spring thinks the provided entity has already been persisted.  Unlike `EntityManager::persist`, merge can create and return a new object instead of modifying the provided object.  Merge creates and copies when its target is in a *detached* or *transient* state.  When copying, the provided object is replaced (in the persistence context) with the new object.  The original object should no longer be used.  Spring will think an entity has been persisted whenever its identifier is non-null.  So, it mistakenly uses merge when persisting a transient entity with a natural id (i.e., an id not generated in the DB).  In these cases, the merge will run a SQL select on the object, realize it hasn't been persisted, run a SQL insert to persist it, then return an identical copy of the original entity. If you created other transient objects (i.e., objects that aren't part of the persistence context) with references to the original entity, you will need to update those references as the object returned by merge is a separate copy in memory.  Otherwise, persisting the dependent entity will cause two references to exist in the persistence context for the same object.  So, always ensure that references in dependent entities are updated after calling `save` on their dependency.
+    * If the context has been flushed, you may see extra queries after updating the references even though nothing has changed.  This is because the reference was changed (even though none of the underlying values were modified).  This can only happen with entities that have natural ids.  The extra queries will go away if you avoid flushing until after all modifications have been made.
+    * This same error occurs when calling `EntityManager::persist` twice on two objects with equal id.  That can happen when a generator produces an object with a natural (non-null) id equal to that of another object in the persistence context.  In this case, change the `persist` to a `merge` and update the object with the result of `merge`.
+  * **InvalidDataAccessApiUsageException**:
+  * Lazy versus eager loading: this is what often kills server performance.  The client either gets too much or too little.  When everything is lazily loaded, the client likely requires many trips to the server before they have what they need (client-side joins).  When everything is eager loaded, the client gets a lot more than they need (possibly everything in the DB) via a single call.  Because the "just right" amount of data is highly situational, I think it's critical for the server to be flexible here.  Accommodating a change here should be easy to implement, test, and maintain.  For this reason, we use a lot of dynamic queries and we avoid DTOs.
+  * DRY: copy-paste code is difficult to maintain and easy to break as it often goes out-of-sync.  This is especially true for code at the interface layer. Ideally, a single @Entity class would defines the data in all layers: client, server, DB, and any JSON or other serialized wire-representations in between.  Ideally, all other temporary data structures would be generated from the Entity and not exposed in our programming or service API.  This ideal is unachievable, but we should strive to remain as close to it as we reasonably can.  For this reason, this code makes use of views or other techniques for minimizing code by dynamically generating intermediate data representations.  It also avoids mixin classes and DTOs.  It strives to share the @Entity between server and client.  In my opinion, the @Enity is the most important interface-layer code and documentation.  We should put the most effort into avoiding its duplication.
+  * This package includes a base repository class which all other repositories inherit.  This allows us to influence the behavior of all repositories.
+  * When calling `save` on a repo, always update any references to this instance by assigning them to the returned value.
+  
+## Generated Code
+
+### Supported
+
+This is in order of most to least preferred.
+
+  * OO / Functional: Really, this includes anything static (known and used at compile time) which is supported by the language.  This can yield complex code (OO often requires generics), but it is preferred to generated code.
+  * Static code generators.  It's easier to debug code when it is available at compile time and can be accessed from the IDE.
+  * Dynamic code.  The trend in Java (especially in *Spring* and *Hibernate*) is to employ dynamically generated proxy classes.  These are configured via run time annotations.  So, most of the implementation in this project will be using that.
+    * Reflection.  This can yield big savings by avoiding code duplication.  Performance can be an issue, but that is very rare in practice.
+    * Configuration.  When it's not possible to abstract some behavior away by the above techniques, we need a way to configure it in an up-front way.  I'm OK with configuration existing in code (code is configuration), but we should make an effort to abstract and expose the configuration points which must vary in production.  This makes it easier to document them and avoid the code duplication cancer.  When something is configured via external files, those files need to be source controlled, released, and deployed alongside the code (configuration is code).
+
+### Avoided
+
+    1. Copy-paste / forked / boiler plate code.  This should be minimized as it complicates the project(s) with inconsistent code that needs to be manually maintained in many separate places.  It also spreads into tests, documentation, configuration, and dependencies.  It's like a contagious form of cancer.  When uncontrolled, it will eventually kill the patient.  Often, it kills more than one patient.
+    1. Manual modifications to statically generated code.  
+    1. Development, test, and deployment processes which don't integrate the creation and use of any required statically generated code.  Not having that integrated into the build makes it too easy to violate the first rule.
+  
+## Hierarchical entities
+
+There are several cases where I needed a flexible mechanism for adding fields to existing entities.  Note, when I say entity I mean the structure in the DB, server, client, and transport layers.  As mentioned above, a goal of mine is to define all of this in one place.  I do not want to support separate definitions of the same entity in each layer.
+
+In the DB representation, the most flexible structure I've found for this is the left join.  With it, we create a parent table for each hierarchical entity in the DB and a separate child table for each specialized representation of that entity.  The parent table includes an identifier which will be used to left join the child tables.  Fields common to all use cases are defined in the parent table.  Fields specific to a subset of use cases are defined in a child table that is left joined with the parent table.  
+
+On the code side, we implement a class hierarchy with a separate sub class for each child table.  This enables methods to accept the parent entity when they are generic enough to apply to all specializations.  It also enables code to iterate over all the entities in the hierarchy.
+
+
+## Testing
+
+Unit testing makes extensive use of random data generators.  These assist in creating, tweaking, persisting, and deleting an entity with all its dependencies.  By tweaking, I mean allowing the test to specify fixed data where it needs to.
+

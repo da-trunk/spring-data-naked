@@ -1,14 +1,8 @@
 package org.datrunk.naked.test.setup;
 
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.function.Consumer;
-
-import javax.annotation.Nonnull;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.datrunk.naked.test.db.container.OracleTestContainer;
+import org.datrunk.naked.test.db.oracle.OracleTestContainer;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.GenericContainer;
@@ -16,6 +10,11 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
+
+import javax.annotation.Nonnull;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.function.Consumer;
 
 /**
  * Starts a server implementation within a docker container hosting Tomcat.

@@ -1,17 +1,9 @@
 package org.datrunk.naked.test.setup;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.sql.DataSource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datrunk.naked.test.db.TestLiquibaseConfiguration;
-import org.datrunk.naked.test.db.container.OracleTestContainer;
+import org.datrunk.naked.test.db.oracle.OracleTestContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -24,6 +16,13 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.Network;
+
+import javax.sql.DataSource;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**

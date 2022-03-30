@@ -62,6 +62,3 @@ decorator:
       log-format: '%(sql);'
       timestamp-format: 'yyyy-MM-dd HH24:MI:SS'
     enabled: true
-executiontimes:
-  logging:
-    enabled: false

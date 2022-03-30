@@ -1,8 +1,6 @@
 package org.datrunk.naked.test.db;
 
-import javax.sql.DataSource;
-
-import org.datrunk.naked.test.db.container.OracleTestContainer;
+import org.datrunk.naked.test.db.oracle.OracleTestContainer;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -14,6 +12,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.testcontainers.containers.Network;
+
+import javax.sql.DataSource;
 
 /**
  * Useful base class for {@link SpringBootTest}-style tests when {@link EnableAutoConfiguration} is active. This ensures that the oracle-xe

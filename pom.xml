@@ -9,7 +9,7 @@
 	<packaging>pom</packaging>
 	<version>0.1-SNAPSHOT</version>
 	<modules>
-    <module>sdn-parent</module>
+		<module>sdn-parent</module>
 		<module>entities</module>
 		<module>server</module>
 		<module>client</module>

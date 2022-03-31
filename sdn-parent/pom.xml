@@ -11,32 +11,19 @@
 	<description>A simple naked objects implementation based on spring-data-rest</description>
 	<properties>
 		<spring-boot.version>2.5.6</spring-boot.version>
-		<spring.version>5.3.12</spring.version>
-		<jackson-bom.version>2.13.0</jackson-bom.version>
-		<hibernate.version>5.4.32.Final</hibernate.version>
 		<liquibase.version>4.3.5</liquibase.version>
 		<liquibase-hibernate5.version>4.3.5</liquibase-hibernate5.version>
 		<javassist.version>3.24.0-GA</javassist.version>
 		<validation-api.version>2.0.1.Final</validation-api.version>
 		<testcontainers.version>1.16.3</testcontainers.version>
-		<commons-lang3.version>3.12.0</commons-lang3.version>
-		<javassist.version>3.28.0-GA</javassist.version>
 		<lombok.version>1.18.22</lombok.version>
 
 		<maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
-		<hibernate5.version>5.4.32.Final</hibernate5.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>com.fasterxml.jackson</groupId>
-				<artifactId>jackson-bom</artifactId>
-				<version>${jackson-bom.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
@@ -80,12 +67,6 @@
 				<groupId>org.testcontainers</groupId>
 				<artifactId>oracle-xe</artifactId>
 				<version>${testcontainers.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.testcontainers</groupId>
-				<artifactId>junit-jupiter</artifactId>
-				<version>1.16.3</version>
-				<scope>test</scope>
 			</dependency>
 			<!-- Used for javax.annotation.Nonnull -->
 			<dependency>
@@ -138,7 +119,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>${commons-lang3.version}</version>
+				<version>3.12.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>

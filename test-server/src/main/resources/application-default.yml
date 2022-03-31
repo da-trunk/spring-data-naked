@@ -1,4 +1,4 @@
-debug: true
+debug: false
 server:
   display-name: 'Test Service'
   compression:

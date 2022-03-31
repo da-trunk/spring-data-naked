@@ -19,7 +19,6 @@
         <dependency>
             <groupId>me.hdpe.bowman</groupId>
             <artifactId>bowman-client</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

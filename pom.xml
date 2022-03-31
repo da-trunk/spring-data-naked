@@ -18,5 +18,6 @@
 		<module>test-entities</module>
 		<module>test-db-oracle</module>
 		<module>test-db-h2</module>
+		<module>test-db-postgres</module>
 	</modules>
 </project>

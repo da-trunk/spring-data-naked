@@ -5,10 +5,13 @@ spring:
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: false
     database-platform: org.hibernate.dialect.Oracle10gDialect
-    properties.hibernate.jdbc.time_zone: UTC
+    properties:
+       hibernate.jdbc.time_zone: UTC
+       jdbc.lob.non_contextual_creation: true
+       dialect: org.hibernate.dialect.PostgreSQLDialect
   jersey:
     type: filter
     # applicationPath: /service
@@ -16,12 +19,9 @@ spring:
     enabled: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:oracle:thin:@localhost:1521/XE
+    url: jdbc:postgresql://localhost:5432/testdb
     username: test
     password: password
-logging:
-  sql:
-    enabled: false
 decorator:
   datasource:
     p6spy:

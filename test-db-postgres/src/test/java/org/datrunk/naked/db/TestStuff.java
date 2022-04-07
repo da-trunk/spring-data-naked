@@ -2,6 +2,7 @@ package org.datrunk.naked.db;
 
 import javax.transaction.Transactional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = { TestStuff.Config.class })
 @ExtendWith({ SpringExtension.class })
 @ActiveProfiles("test")
+@Disabled
 public class TestStuff {
 	static class Config {
 		

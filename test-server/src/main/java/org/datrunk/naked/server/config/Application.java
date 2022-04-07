@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datest.naked.test.entities.User;
 import org.datrunk.naked.entities.config.CollectionDTOConverter;
+import org.datrunk.naked.server.entities.AppDetails;
 import org.datrunk.naked.server.repo.BaseRepositoryImpl;
 import org.datrunk.naked.server.repo.BatchRestRepo;
 import org.datrunk.naked.server.repo.UserRepo;

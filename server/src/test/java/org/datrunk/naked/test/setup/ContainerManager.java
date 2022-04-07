@@ -1,5 +1,14 @@
 package org.datrunk.naked.test.setup;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.annotation.Nonnull;
+import javax.sql.DataSource;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datrunk.naked.test.db.TestLiquibaseConfiguration;
@@ -16,13 +25,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.Network;
-
-import javax.sql.DataSource;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -77,10 +79,13 @@ public class ContainerManager {
                 // Take properties from application.properties
                 String user = ctx.getEnvironment()
                     .getProperty("spring.datasource.username");
+                assertThat(user).isNotNull();
                 String password = ctx.getEnvironment()
                     .getProperty("spring.datasource.password");
+                assertThat(password).isNotNull();
                 String image = ctx.getEnvironment()
                     .getProperty("spring.datasource.container.image");
+                assertThat(image).isNotNull();
                 boolean reUse = Boolean.parseBoolean(ctx.getEnvironment()
                     .getProperty("spring.datasource.container.reuse"));
 
@@ -97,11 +102,12 @@ public class ContainerManager {
                 assertThat(oracle).isNotNull();
 
                 // This is populated via resource filtering during phase test-compile. It is in src/test/resources/application.properties.
-                String version = ctx.getEnvironment()
+                @Nonnull String version = ctx.getEnvironment()
                     .getProperty("application.version");
-                String image = ctx.getEnvironment()
+                assertThat(version).isNotNull();
+                @Nonnull String image = ctx.getEnvironment()
                     .getProperty("application.container.image");
-                boolean reUse = Boolean.parseBoolean(ctx.getEnvironment()
+                @Nonnull boolean reUse = Boolean.parseBoolean(ctx.getEnvironment()
                     .getProperty("application.container.reuse"));
 
                 assertThat(version).isNotNull();

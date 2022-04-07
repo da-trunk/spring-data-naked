@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.datrunk.naked.entities.CollectionDTO;
 import org.datrunk.naked.entities.IdClass;
+import org.datrunk.naked.entities.bowman.annotation.RemoteResource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -37,7 +38,6 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import uk.co.blackpepper.bowman.annotation.RemoteResource;
 
 @Log4j2
 public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {

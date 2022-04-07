@@ -14,19 +14,16 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.datrunk.naked</groupId>
             <artifactId>server</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.datrunk.naked</groupId>
             <artifactId>test-entities</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.datrunk.naked</groupId>
             <artifactId>test-db-h2</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

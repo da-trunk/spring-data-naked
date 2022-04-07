@@ -15,11 +15,10 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.MyEqualsBuilder;
+import org.datrunk.naked.entities.bowman.annotation.ResourceId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableSet;
-
-import uk.co.blackpepper.bowman.annotation.ResourceId;
 
 /**
  * Unfortunately, some newly created {@link Entity} types include a database-managed identifier. These entities cannot

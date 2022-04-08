@@ -2,9 +2,12 @@ package org.datrunk.naked.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.datest.naked.test.entities.User;
 import org.datrunk.naked.client.config.Config;
-import org.datrunk.naked.test.setup.ContainerManager;
+import org.datrunk.naked.server.tomcat.ContainerManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,10 +28,10 @@ public class ClientTest extends ContainerManager {
     /**
      * Reset the DB before running the next test class.
      */
-//    @AfterAll
-//    public static void resetContainers() {
-//        ContainerManager.resetContainers();
-//    }
+    // @AfterAll
+    // public static void resetContainers() {
+    // ContainerManager.resetContainers();
+    // }
 
     @Autowired
     private RestTemplate restTemplate;
@@ -44,5 +47,10 @@ public class ClientTest extends ContainerManager {
     @Test
     public void testCreate() {
         repoClientFactory.create(User.class, Long.class);
+    }
+
+    @Override
+    protected Path getWarPath(String artifactId, String version) {
+        return Paths.get(String.format("target/$s-%s.war", artifactId, version));
     }
 }

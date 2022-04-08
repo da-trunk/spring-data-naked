@@ -1,6 +1,6 @@
-package org.datrunk.naked.test.db;
+package org.datrunk.naked.db;
 
-import org.datrunk.naked.test.db.oracle.OracleTestContainer;
+import org.datrunk.naked.db.oracle.OracleTestContainer;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

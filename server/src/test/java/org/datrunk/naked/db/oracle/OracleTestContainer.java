@@ -1,4 +1,4 @@
-package org.datrunk.naked.test.db.oracle;
+package org.datrunk.naked.db.oracle;
 
 import liquibase.Contexts;
 import liquibase.Liquibase;

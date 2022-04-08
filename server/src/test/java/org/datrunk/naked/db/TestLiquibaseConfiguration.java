@@ -1,4 +1,4 @@
-package org.datrunk.naked.test.db;
+package org.datrunk.naked.db;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

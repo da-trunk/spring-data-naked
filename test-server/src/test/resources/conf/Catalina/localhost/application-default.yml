@@ -1,0 +1,29 @@
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure.include: '*'
+  endpoint:
+    shutdown.enabled: true
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:oracle:thin:@code-mapping-database:1521/XE
+    username: cm_jobs
+    password: password
+    v1:
+      username: cm_test
+      password: password
+    container:
+      image: docker-snapshot.cernerrepos.net/si-mapping/si-jobs-database:0.7.9
+      reuse: false
+  application.admin.enabled: true
+  liquibase:
+    enabled: false
+logging:
+  level:
+    root: warn
+    com.cerner: info

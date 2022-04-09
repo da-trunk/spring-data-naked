@@ -45,6 +45,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.datrunk.naked</groupId>
+            <artifactId>test-server</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <scope>test</scope>

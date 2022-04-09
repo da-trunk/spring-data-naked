@@ -1,0 +1,38 @@
+debug: false
+server:
+  #servlet.context-path: /service
+  tomcat.accesslog:
+    enabled: true
+    basedir: target/tomcat
+  port: '9080'
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure.include: '*'
+  endpoint:
+    shutdown.enabled: true
+spring:
+  config:
+    import:
+    - classpath:application-server.yml
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/XE
+    username: cm_jobs
+    password: password
+    v1:
+      username: cm_test
+      password: password
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+  application.admin.enabled: true
+logging:
+  level:
+    root: warn
+    "[org.springframework.transaction.interceptor]": warn
+#    "[com.cerner.concept.mapping]": debug
+#    "[org.springframework.web]": info
+#    "[org.hibernate]": warn
+#    "[org.springframework.boot.web.embedded.tomcat.TomcatWebServer]": info

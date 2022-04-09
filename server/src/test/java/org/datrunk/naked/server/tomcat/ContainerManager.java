@@ -2,10 +2,11 @@ package org.datrunk.naked.server.tomcat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
@@ -26,7 +27,10 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.testcontainers.containers.Container.ExecResult;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.utility.MountableFile;
 
 /**
  * Manages docker containers for integration tests.
@@ -41,20 +45,84 @@ import org.testcontainers.containers.Network;
 public class ContainerManager {
     private static Logger log = LogManager.getLogger();
 
-    private static OracleTestContainer oracle;
+    private static JdbcDatabaseContainer<? extends JdbcDatabaseContainer<?>> db;
     private static TomcatContainer tomcat;
     private static ConfigurableApplicationContext ctx = null;
 
     protected ContainerManager() {
-        Initializer.configurer = Initializer::defaultConfigurer;
+        Initializer.configurer = this::configure;
     }
 
-    protected ContainerManager(BiFunction<TomcatContainer, Environment, TomcatContainer> configurer) {
-        Initializer.configurer = configurer;
+    /**
+     * Uses Spring environment variables to locate a war file and conf directory which should be accessible within the container before it
+     * is started. Certain variables must be present in the {@link Environment}. Add a resource file to the test classpath which defines
+     * these properties. Override this method to provide a custom implementation.
+     * 
+     * @param container a partially configured {@link TomcatContainer}
+     * @param environment the Spring {@link Environment}
+     * @return the {@link TomcatContainer} after configuring the war file and conf directories.
+     */
+    protected TomcatContainer configure(final TomcatContainer container, final Environment environment) {
+        @Nonnull
+        String baseDir = environment.getProperty("application.buildDir");
+        assertThat(baseDir).isNotEmpty();
+        assertThat(baseDir).doesNotStartWith("@");
+        if (baseDir.startsWith("/c/")) // this messes up Windows
+            baseDir = baseDir.substring(2);
+        @Nonnull
+        String war = environment.getProperty("application.warName");
+        assertThat(war).isNotEmpty();
+        assertThat(war).doesNotStartWith("@");
+
+        // return container.withCopyFileToContainer(MountableFile.forClasspathResource(war, 0600), "/usr/local/tomcat/webapps/service.war")
+        // .withClasspathResourceMapping("conf/", "/usr/local/tomcat/", BindMode.READ_ONLY);
+        // container.copyFileToContainer(MountableFile.forHostPath(Paths.get(String.format("%s/%s", baseDir, war))
+        // .toAbsolutePath()
+        // .toString()), "/usr/local/tomcat/webapps/ROOT.war");
+        // container.copyFileToContainer(MountableFile.forHostPath(Paths.get(String.format("%s/test-classes/conf/server.xml", baseDir))
+        // .toAbsolutePath()
+        // .toString()), "/usr/local/tomcat/conf/server.xml");
+        // container
+        // .copyFileToContainer(MountableFile.forHostPath(Paths.get(String.format("%s/test-classes/conf/Catalina/localhost/", baseDir))
+        // .toAbsolutePath()
+        // .toString()), "/usr/local/tomcat/conf/conf/Catalina/localhost");
+
+//        exec(container, "rm", "-rf", "/usr/local/tomcat/webapps/ROOT");
+        copyFileToContainer(container, String.format("%s/%s", baseDir, war), "/usr/local/tomcat/webapps/ROOT.war");
+//        copyFileToContainer(container, String.format("%s/test-classes/conf/server.xml", baseDir), "/usr/local/tomcat/conf/server.xml");
+        copyFileToContainer(container, String.format("%s/test-classes/conf/Catalina/localhost/", baseDir),
+            "/usr/local/tomcat/conf/Catalina/localhost");
+//        exec(container, "bin/shutdown.sh; sleep 5; bin/startup.sh");
+
+        // return in.withFileSystemBind(confPath.toAbsolutePath()
+        // .toString(), "/usr/local/tomcat/conf")
+        // .withFileSystemBind(warPath.toAbsolutePath()
+        // .toString(), "/usr/local/tomcat/webapps/service.war");
+
+        return container;
     }
 
-    protected Path getWarPath(String artifactId, String version) {
-        return Paths.get(String.format("target/$s-%s.war", artifactId, version));
+    private int exec(TomcatContainer container, String... command) {
+        ExecResult result = null;
+        try {
+            log.info("exec [{}] in [{}]", Stream.of(command)
+                .collect(Collectors.joining(" ")), container.getDockerImageName());
+            result = container.execInContainer(command);
+            log.info(result.getStdout());
+        } catch (UnsupportedOperationException | IOException | InterruptedException e) {
+            log.catching(e);
+            if (result == null)
+                log.error(result.getStderr());
+        }
+        assert (result != null);
+        return result.getExitCode();
+    }
+
+    private TomcatContainer copyFileToContainer(TomcatContainer container, String fromPath, String toPath) {
+//        exec(container, "rm", "-rf", toPath);
+        log.info("Copying [{}:{}] to [{}:{}]", container.getHost(), fromPath, container.getDockerImageName(), toPath);
+        container.copyFileToContainer(MountableFile.forHostPath(fromPath), toPath);
+        return container;
     }
 
     @Autowired
@@ -82,15 +150,22 @@ public class ContainerManager {
      * 
      */
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        public static BiFunction<TomcatContainer, Environment, TomcatContainer> configurer;
+        public static BiFunction<TomcatContainer, Environment, TomcatContainer> configurer = (container, env) -> {
+            throw new IllegalStateException("The configurer has not been initialized");
+        };
 
         @Override
         public void initialize(ConfigurableApplicationContext ctx) {
-            ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
+            final Network network = db == null ? Network.newNetwork() : db.getNetwork();
+            log.info("created network [{}]", network.getId());
             System.setProperty("java.io.tmpdir", "/tmp");
+            initialize(ctx, network);
+        }
+
+        public void initialize(ConfigurableApplicationContext ctx, Network network) {
+            ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
             final Environment env = ctx.getEnvironment();
-            final Network network = oracle == null ? Network.newNetwork() : oracle.getNetwork();
-            if (oracle == null) {
+            if (db == null) {
                 // Take properties from application.properties
                 String user = env.getProperty("spring.datasource.username");
                 assertThat(user).isNotNull();
@@ -100,24 +175,26 @@ public class ContainerManager {
                 assertThat(image).isNotNull();
                 boolean reUse = Boolean.parseBoolean(env.getProperty("spring.datasource.container.reuse"));
 
-                oracle = new OracleTestContainer(image, user, password, network, container -> container.withReuse(reUse));
-                log.info("Oracle started at {}", oracle.getJdbcUrl());
+                db = new OracleTestContainer(image, user, password, network, container -> container.withReuse(reUse));
+                log.info("Oracle started at {}", db.getJdbcUrl());
 
                 // Programmatically register the containers as beans so they can be injected
-                beanFactory.registerSingleton(oracle.getClass()
-                    .getCanonicalName(), oracle);
-                TestPropertySourceUtils.addInlinedPropertiesToEnvironment(ctx, "spring.datasource.url=" + oracle.getJdbcUrl());
-                System.setProperty("DB_URL", oracle.getJdbcUrl());
+                beanFactory.registerSingleton(db.getClass()
+                    .getCanonicalName(), db);
+                TestPropertySourceUtils.addInlinedPropertiesToEnvironment(ctx, "spring.datasource.url=" + db.getJdbcUrl());
+                System.setProperty("DB_URL", db.getJdbcUrl());
             }
             if (tomcat == null) {
-                assertThat(oracle).isNotNull();
+                assertThat(db).isNotNull();
 
                 @Nonnull
                 String image = env.getProperty("application.container.image");
                 @Nonnull
                 boolean reUse = Boolean.parseBoolean(env.getProperty("application.container.reuse"));
 
-                tomcat = new TomcatContainer(image, network, oracle, container -> defaultConfigurer(container.withReuse(reUse), env));
+                tomcat = new TomcatContainer(image, network, env, db, container -> container.withReuse(reUse));
+
+//                configurer.apply(tomcat, env);
 
                 beanFactory.registerSingleton(tomcat.getClass()
                     .getCanonicalName(), tomcat);
@@ -133,26 +210,6 @@ public class ContainerManager {
                     .toASCIIString());
             }
         }
-
-        public static TomcatContainer defaultConfigurer(final TomcatContainer in, final Environment env) {
-            // This is populated via resource filtering during phase test-compile. It is in src/test/resources/application.properties.
-            @Nonnull
-            String baseDir = env.getProperty("application.buildDir");
-            @Nonnull
-            String artifactId = env.getProperty("application.artifactId");
-            assertThat(artifactId).isNotNull();
-            @Nonnull
-            String version = env.getProperty("application.version");
-            assertThat(version).isNotNull();
-            Path warPath = Paths.get(String.format("%s/%s-%s.war", baseDir, artifactId, version));
-            
-            String warDir = env.getProperty("application.warDir");
-            String confDir = env.getProperty("application.confDir");
-
-            return in.withFileSystemBind(String.format("%s/conf", baseDir), "/usr/local/tomcat/conf")
-                .withFileSystemBind(warPath.toAbsolutePath()
-                    .toString(), "/usr/local/tomcat/webapps/service.war");
-        }
     }
 
     /**
@@ -164,15 +221,15 @@ public class ContainerManager {
      */
     @DynamicPropertySource
     static void datasourceConfig(DynamicPropertyRegistry registry) {
-        if (oracle != null)
-            registry.add("spring.datasource.url", oracle::getJdbcUrl);
+        if (db != null)
+            registry.add("spring.datasource.url", db::getJdbcUrl);
     }
 
-    public static OracleTestContainer getOracleInstance() {
-        if (oracle == null) {
+    public static JdbcDatabaseContainer<? extends JdbcDatabaseContainer<?>> getDbInstance() {
+        if (db == null) {
             throw new IllegalStateException("No instance has been initialized");
         }
-        return oracle;
+        return db;
     }
 
     public static TomcatContainer getServerInstance() {
@@ -200,18 +257,20 @@ public class ContainerManager {
      * but @DirtiesContext is all that worked for me.
      */
     public static void resetContainers() {
-        if (oracle != null) {
+        if (db != null) {
             assertThat(ctx).isNotNull();
             tomcat.close();
-            oracle.close();
-            Network network = oracle.getNetwork();
-            oracle = new OracleTestContainer(oracle.getDockerImageName(), oracle.getUsername(), oracle.getPassword(), network,
-                container -> container.withReuse(false));
-            tomcat = new TomcatContainer(tomcat.getDockerImageName(), network, oracle, container -> container.withReuse(false));
+            tomcat = null;
+            db.close();
+            db = null;
+            Network network = db.getNetwork();
+            // db = new OracleTestContainer(db.getDockerImageName(), db.getUsername(), db.getPassword(), network,
+            // container -> container.withReuse(false));
+            // tomcat = new TomcatContainer(tomcat.getDockerImageName(), network, db, container -> container.withReuse(false));
             if (liquibaseContainer != null)
                 liquibaseContainer.reset();
             Initializer initializer = new ContainerManager.Initializer();
-            initializer.initialize(ctx);
+            initializer.initialize(ctx, network);
         }
     }
 }

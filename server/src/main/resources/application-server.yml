@@ -1,0 +1,62 @@
+server:
+  display-name: 'Test Service'
+  compression:
+    enabled: false
+spring:
+  application:
+    name: test-api
+  main:
+    banner-mode: 'off'
+    allow-bean-definition-overriding: true
+  data:
+    rest:
+      base-path: /api
+      return-body-on-create: true
+      return-body-on-update: true
+      #default-media-type: application/JSON
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.Oracle10gDialect
+    properties.hibernate.jdbc.time_zone: UTC
+  jersey:
+    type: filter
+    # applicationPath: /service
+  liquibase:
+    enabled: false
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    tomcat:
+      max-idle: 1
+      max-active: 1
+      max-wait: -1
+      test-on-borrow: true
+      validation-query: select 1 from dual
+      validation-query-timeout: 30
+    type: org.apache.tomcat.jdbc.pool.DataSource
+  mvc.converters.preferred-json-mapper: jackson
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      write-dates-as-timestamps: false
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non-null
+logging:
+  sql:
+    enabled: false
+decorator:
+  datasource:
+    p6spy:
+      multiline: true
+      enable-logging: true
+      logging: sysout
+      log-format: '%(sql);'
+      timestamp-format: 'yyyy-MM-dd HH24:MI:SS'
+    enabled: true
+executiontimes:
+  logging:
+    enabled: false

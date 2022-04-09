@@ -18,7 +18,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.DatabaseDriver;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -43,7 +42,7 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 @SpringBootApplication
 // @Configuration
 // @EnableAutoConfiguration
-@EnableConfigurationProperties({ AppDetails.class, Application.TomcatConnectionProperties.class })
+@EnableConfigurationProperties({ AppDetails.class, TomcatConnectionProperties.class })
 // @ComponentScan({})
 @Import({ Application.Config.class })
 @PropertySources({ @PropertySource("classpath:application-server.yml"), @PropertySource("classpath:application-default.yml"),
@@ -166,46 +165,6 @@ public class Application extends SpringBootServletInitializer {
     @Bean
     public ResourceConfig jerseyConfig() {
         return new JerseyConfig();
-    }
-
-    @ConfigurationProperties(prefix = "spring.datasource.tomcat")
-    public static class TomcatConnectionProperties {
-        private int validationQueryTimeout = 300;
-        private int maxActive = 10;
-        private int maxWait = 10;
-        private int maxIdle = 10;
-
-        public int getValidationQueryTimeout() {
-            return validationQueryTimeout;
-        }
-
-        public void setValidationQueryTimeout(int validationQueryTimeout) {
-            this.validationQueryTimeout = validationQueryTimeout;
-        }
-
-        public int getMaxActive() {
-            return maxActive;
-        }
-
-        public void setMaxActive(int maxActive) {
-            this.maxActive = maxActive;
-        }
-
-        public int getMaxWait() {
-            return maxWait;
-        }
-
-        public void setMaxWait(int maxWait) {
-            this.maxWait = maxWait;
-        }
-
-        public int getMaxIdle() {
-            return maxIdle;
-        }
-
-        public void setMaxIdle(int maxIdle) {
-            this.maxIdle = maxIdle;
-        }
     }
 
     // @see {@link ApplicationContextProvider}

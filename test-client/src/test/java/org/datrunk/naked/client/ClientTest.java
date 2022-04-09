@@ -48,9 +48,4 @@ public class ClientTest extends ContainerManager {
     public void testCreate() {
         repoClientFactory.create(User.class, Long.class);
     }
-
-    @Override
-    protected Path getWarPath(String artifactId, String version) {
-        return Paths.get(String.format("target/$s-%s.war", artifactId, version));
-    }
 }

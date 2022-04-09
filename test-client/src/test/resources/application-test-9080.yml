@@ -1,0 +1,8 @@
+client.repo:
+  location: http://localhost:9080/api
+spring:
+  config:
+    import:
+    - classpath:application-test.yml
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/XE

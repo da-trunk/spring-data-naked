@@ -2,13 +2,9 @@ package org.datrunk.naked.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.datest.naked.test.entities.User;
 import org.datrunk.naked.client.config.Config;
-import org.datrunk.naked.server.tomcat.ContainerManager;
-import org.junit.jupiter.api.AfterAll;
+import org.datrunk.naked.server.test.tomcat.ContainerManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

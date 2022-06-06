@@ -1,39 +1,44 @@
 debug: false
-application:
-  container:
-    image: docker-snapshot.cernerrepos.net/si-mapping/jobs-api:latest
-    reuse: false
-  admin.enabled: false
-client.repo:
-  location: '${V1_URL}/api'
-spring:
-  config:
-    import:
-    - classpath:application-server.yml
-    - classpath:application-version.yml
-  datasource:
-    url: ${DB_URL}
-    username: cm_jobs
-    password: password
-    container:
-      image: docker-snapshot.cernerrepos.net/si-mapping/si-jobs-database:0.7.9
+test:
+  containers:
+    db:
+      image: mysql:8.0.29
       reuse: false
-    v1:
-      username: cm_test
-      password: password
-  jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: update
-  liquibase:
-    enabled: false
-    change-log: classpath:liquibase/changelog-test.xml
-    contexts: test,xe,production
-    dropFirst: false
+      datasource:
+        username: test
+        password: password
+      application:
+        build-dir: '@project.build.directory@'
+    tomcat:
+      image: tomcat:9-jdk8-adoptopenjdk-hotspot
+      reuse: false
+      application:
+        build-dir: '@project.build.directory@'
+        war-name: ROOT.war
+    server:
+      image: jdk:latest
+      reuse: false
+      application:
+        exe-dir: '@project.build.directory@/test-server'
+client:
+  repo:
+    location: http://localhost:9080/api
+spring:
+#  config:
+#    import:
+#    - classpath:application-server.yml
+#    - optional:classpath:application.yml
+#  jpa:
+#    generate-ddl: true
+#    hibernate:
+#      ddl-auto: update
+#  liquibase:
+#    enabled: false
+#    change-log: classpath:liquibase/changelog-test.xml
+#    contexts: test
+#    dropFirst: false
 logging:
   level:
     root: warn
-    com.cerner: trace
-    uk.co.blackpepper.bowman: trace
-    org.testcontainers: info
     org.datrunk.naked: trace
+    uk.co.blackpepper.bowman: trace

@@ -1,4 +1,4 @@
-package org.datrunk.naked.server.test.tomcat;
+package org.datrunk.naked.client.container;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,7 +8,9 @@ import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.annotation.Nonnull;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datrunk.naked.test.container.SpringTestContainer;

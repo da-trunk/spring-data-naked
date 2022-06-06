@@ -1,7 +1,7 @@
 package org.datrunk.naked.test.setup;
 
 
-import org.datrunk.naked.server.config.Application;
+import org.datrunk.naked.server.Application;
 import org.datrunk.naked.server.config.JerseyConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 

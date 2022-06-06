@@ -61,51 +61,39 @@ public class DataSourceWrapper {
   }
 
   public int getInt(String sql, Object param) throws Exception {
-    List<Integer> results =
-        executeQuery(sql, stmt -> stmt.setObject(1, param), row -> row.getInt(1));
+    List<Integer> results = executeQuery(sql, stmt -> stmt.setObject(1, param), row -> row.getInt(1));
     assertThat(results).hasSize(1);
     assertThat(results.get(0)).isNotNull();
     return results.get(0).intValue();
   }
 
   public String getString(String sql, Object param) throws Exception {
-    List<String> results =
-        executeQuery(sql, stmt -> stmt.setObject(1, param), row -> row.getString(1));
+    List<String> results = executeQuery(sql, stmt -> stmt.setObject(1, param), row -> row.getString(1));
     assertThat(results).hasSize(1);
     assertThat(results.get(0)).isNotNull();
     return results.get(0);
   }
 
-  public <T> List<T> executeQuery(String sql, ThrowingFunction<ResultSet, T> rowMapper)
-      throws Exception {
-    return executeQuery(getUsername(), getPassword(), sql, stmt -> {}, rowMapper);
+  public <T> List<T> executeQuery(String sql, ThrowingFunction<ResultSet, T> rowMapper) throws Exception {
+    return executeQuery(getUsername(), getPassword(), sql, stmt -> {
+    }, rowMapper);
   }
 
-  public <T> List<T> executeQuery(
-      final String sql,
-      ThrowingConsumer<PreparedStatement> initPreparedStatement,
-      ThrowingFunction<ResultSet, T> rowMapper)
-      throws Exception {
+  public <T> List<T> executeQuery(final String sql, ThrowingConsumer<PreparedStatement> initPreparedStatement,
+      ThrowingFunction<ResultSet, T> rowMapper) throws Exception {
     return executeQuery(getUsername(), getPassword(), sql, initPreparedStatement, rowMapper);
   }
 
-  public <T> List<T> executeQuery(
-      String user, String password, String sql, ThrowingFunction<ResultSet, T> rowMapper)
-      throws Exception {
-    return executeQuery(user, password, sql, stmt -> {}, rowMapper);
+  public <T> List<T> executeQuery(String user, String password, String sql, ThrowingFunction<ResultSet, T> rowMapper) throws Exception {
+    return executeQuery(user, password, sql, stmt -> {
+    }, rowMapper);
   }
 
-  public <T> List<T> executeQuery(
-      String user,
-      String password,
-      final String sql,
-      ThrowingConsumer<PreparedStatement> initPreparedStatement,
-      ThrowingFunction<ResultSet, T> rowMapper)
-      throws Exception {
+  public <T> List<T> executeQuery(String user, String password, final String sql, ThrowingConsumer<PreparedStatement> initPreparedStatement,
+      ThrowingFunction<ResultSet, T> rowMapper) throws Exception {
     List<T> result = new ArrayList<>();
     log.trace(sql);
-    try (Connection connection = getConnection(user, password);
-        PreparedStatement statement = connection.prepareStatement(sql)) {
+    try (Connection connection = getConnection(user, password); PreparedStatement statement = connection.prepareStatement(sql)) {
       initPreparedStatement.accept(statement);
       log.trace(statement);
       statement.executeQuery();
@@ -118,11 +106,24 @@ public class DataSourceWrapper {
     return result;
   }
 
+  public int executeUpdate(final String sql)
+      throws SQLException {
+    return executeUpdate(userName, password, sql, stmt -> {});
+  }
+
+  public int executeUpdate(String user, String password, final String sql, ThrowingConsumer<PreparedStatement> initPreparedStatement)
+      throws SQLException {
+    log.trace(sql);
+    try (Connection connection = getConnection(user, password); PreparedStatement statement = connection.prepareStatement(sql)) {
+      log.trace(statement);
+      return statement.executeUpdate();
+    }
+  }
+
   public int executeCount(String sql) throws Exception {
     int result = 0;
     log.trace(sql);
-    try (Connection connection = getConnection();
-        Statement statement = connection.createStatement()) {
+    try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
       statement.execute(sql);
       try (ResultSet rs = statement.getResultSet()) {
         while (rs.next()) {
@@ -133,12 +134,13 @@ public class DataSourceWrapper {
     return result;
   }
 
-  public void consumeQuery(
-      String user, String password, String sql, ThrowingConsumer<ResultSet> consumer)
-      throws Throwable {
+  public void consumeQuery(String sql, ThrowingConsumer<ResultSet> consumer) throws Throwable {
+    consumeQuery(userName, password, sql, consumer);
+  }
+
+  public void consumeQuery(String user, String password, String sql, ThrowingConsumer<ResultSet> consumer) throws Throwable {
     log.trace(sql);
-    try (Connection connection = getConnection(user, password);
-        Statement statement = connection.createStatement()) {
+    try (Connection connection = getConnection(user, password); Statement statement = connection.createStatement()) {
       statement.execute(sql);
       try (ResultSet rs = statement.getResultSet()) {
         while (rs.next()) {

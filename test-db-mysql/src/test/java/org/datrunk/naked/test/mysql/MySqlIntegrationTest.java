@@ -5,19 +5,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
+
 import javax.sql.DataSource;
-import liquibase.exception.LiquibaseException;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
 import org.datrunk.naked.db.mysql.MySqlTestContainer;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -30,13 +28,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import liquibase.exception.LiquibaseException;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ExtendWith({SpringExtension.class})
+@ExtendWith({ SpringExtension.class })
 @TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(
-    initializers = {MySqlTestContainer.Factory.class},
-    classes = {MySqlIntegrationTest.Config.class})
+@ContextConfiguration(initializers = { MySqlTestContainer.Factory.class }, classes = { MySqlIntegrationTest.Config.class })
 @EnableConfigurationProperties(DataSourceProperties.class)
 @ActiveProfiles("test")
 class MySqlIntegrationTest {
@@ -52,78 +52,51 @@ class MySqlIntegrationTest {
     @Bean
     public DataSource dataSource(MySqlTestContainer db) throws LiquibaseException, SQLException {
       if (!initialized) {
-        db.updateAsSys("liquibase/mysql/init.xml");
-        db.update("liquibase/mysql/schema-update-versioned.xml");
-        db.update("liquibase/mysql/content/master.xml");
+//        db.updateAsSys("liquibase/mysql/init.xml");
+//        db.update("liquibase/mysql/schema-update-versioned.xml");
+//        db.update("liquibase/mysql/content/master.xml");
         initialized = true;
       }
       return db.getDataSource();
     }
   }
 
-  @Autowired private MySqlTestContainer mySql;
-  private static List<Record> records;
+  private DataSourceWrapper db;
+
+  @Autowired
+  void setDataSource(MySqlTestContainer mySql) {
+    db = mySql.getDataSourceWrapper();
+  }
 
   @BeforeAll
   void before() throws Exception {
-    assertThat(mySql).isNotNull();
     if (USE_TESTCONTAINERS) {
-      DataSourceWrapper db = mySql.getDataSourceWrapper();
       assertThat(db).isNotNull();
     }
   }
 
-  static Stream<Record> getTestRecords() throws Exception {
-    assertThat(records).isNotEmpty();
-    return records.stream();
+  @Test
+  void getYValues() throws Exception {
+    db.executeUpdate("create table points (x int, y int)");
+    db.executeUpdate("insert into points values (1,2)");
+    List<Point> actual = Point.findByX(db, 1);
+    assertThat(actual).containsOnly(new Point(1, 2));
   }
 
   @Data
   @RequiredArgsConstructor
-  private static class MyRow {
-    private final String codeSystem;
-    private final String value;
-    private final String displayType;
-    private final String primaryName;
-    private final String altName;
+  private static class Point {
+    private final Integer x;
+    private final Integer y;
 
-    public MyRow(final ResultSet row) throws SQLException {
-      codeSystem = row.getString("code_system_id");
-      value = row.getString("code_system_value");
-      displayType = row.getString("display_ype");
-      primaryName = row.getString("primary_name");
-      altName = row.getString("alt_name");
+    public Point(final ResultSet row) throws SQLException {
+      x = row.getInt("x");
+      y = row.getInt("y");
+    }
+
+    public static List<Point> findByX(DataSourceWrapper db, int x) throws Exception {
+      return db.executeQuery("select x,y from points where x = ?", stmt -> stmt.setInt(1, x), Point::new);
     }
   }
 
-  @ParameterizedTest(name = "Given [{0}]")
-  @MethodSource("getTestRecords")
-  void testCompleted(Record record) throws Exception {
-    DataSourceWrapper db = mySql.getDataSourceWrapper();
-    assertThat(db).isNotNull();
-  }
-
-  @Data
-  @RequiredArgsConstructor
-  private static class Record {
-    private final int id;
-    private final String key;
-    private final int count;
-
-    public Record(ResultSet row) throws SQLException {
-      id = row.getInt("id");
-      key = row.getString("key");
-      count = row.getInt("count");
-    }
-  }
-  ;
-
-  private List<Record> getRecordsWithCount(int id) throws Exception {
-    return mySql
-        .getDataSourceWrapper()
-        .executeQuery(
-            "select key, count(*) from records where id=? group by key order by key",
-            stmt -> stmt.setInt(1, id),
-            Record::new);
-  }
 }

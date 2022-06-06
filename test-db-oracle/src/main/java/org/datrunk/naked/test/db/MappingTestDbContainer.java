@@ -1,6 +1,8 @@
 package org.datrunk.naked.test.db;
 
 import javax.annotation.Nonnull;
+
+import org.datrunk.naked.db.oracle.OracleTestContainer;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;

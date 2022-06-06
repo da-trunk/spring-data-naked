@@ -24,7 +24,8 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>test-db</artifactId>
+            <artifactId>test-db-mysql</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

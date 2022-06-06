@@ -1,11 +1,15 @@
-package org.datrunk.naked.server.config;
+package org.datrunk.naked.server;
 
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datest.naked.test.entities.User;
 import org.datrunk.naked.entities.config.CollectionDTOConverter;
+import org.datrunk.naked.server.config.ApplicationContextProvider;
+import org.datrunk.naked.server.config.JerseyConfig;
+import org.datrunk.naked.server.config.TomcatConnectionProperties;
 import org.datrunk.naked.server.entities.AppDetails;
 import org.datrunk.naked.server.repo.BaseRepositoryImpl;
 import org.datrunk.naked.server.repo.BatchRestRepo;
@@ -46,8 +50,7 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 @Import({Application.Config.class})
 @PropertySources({
   @PropertySource("classpath:application-server.yml"),
-  @PropertySource("classpath:application-default.yml"),
-  @PropertySource("classpath:application-h2.yml")
+  @PropertySource("classpath:application-default.yml")
 })
 public class Application extends SpringBootServletInitializer {
   private static Logger log = LogManager.getLogger();

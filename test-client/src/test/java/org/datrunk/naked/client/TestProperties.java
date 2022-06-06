@@ -2,7 +2,7 @@ package org.datrunk.naked.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.datrunk.naked.config.EmptyConfig;
+import org.datrunk.naked.test.config.EmptyConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +16,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(classes = EmptyConfig.class, webEnvironment = WebEnvironment.NONE)
 @ExtendWith({ SpringExtension.class })
 @ActiveProfiles("protected")
-@EnableConfigurationProperties(ClientProperties.class)
+@EnableConfigurationProperties(RepoClient.Properties.class)
 public class TestProperties {
     @Autowired
     private ClientProperties clientProperties;
 
-    @Value("${application.version}")
-    private String version;
+    @Value("${test.containers.db.datasource.username}")
+    private String userName;
 
-    @Value("${application.artifactId}")
-    private String artifactId;
+    @Value("${test.containers.db.application.build-dir}")
+    private String buildDir;
 
     @Test
     public void testClientProperties() {
@@ -35,7 +35,7 @@ public class TestProperties {
 
     @Test
     public void testProjectProperties() {
-        assertThat(version).isNotNull();
-        assertThat(artifactId).isNotNull();
+        assertThat(userName).isNotNull();
+        assertThat(buildDir).isNotNull();
     }
 }

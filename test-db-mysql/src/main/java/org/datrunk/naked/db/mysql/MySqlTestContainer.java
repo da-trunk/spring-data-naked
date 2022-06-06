@@ -19,7 +19,7 @@ import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
 /**
- * Extends {@link MySQLContainer} with properties and methods specific to an MRDS database.
+ * Extends {@link MySQLContainer} with properties and methods specific to an mysql database.
  *
  * @author BA030483
  */
@@ -30,10 +30,10 @@ public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer>
   public MySqlTestContainer(
       final @Nonnull Environment environment, Consumer<MySqlTestContainer> extraConfig) {
     this(
-        environment.getProperty("test.containers.mrds.image"),
-        environment.getProperty("test.containers.mrds.datasource.username"),
-        environment.getProperty("test.containers.mrds.datasource.password"),
-        environment.getProperty("test.containers.mrds.application.buildDir"),
+        environment.getProperty("test.containers.db.image"),
+        environment.getProperty("test.containers.db.datasource.username"),
+        environment.getProperty("test.containers.db.datasource.password"),
+        environment.getProperty("test.containers.db.application.build-dir"),
         extraConfig);
   }
 
@@ -54,13 +54,13 @@ public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer>
     withCopyFileToContainer(
         MountableFile.forHostPath(buildDir + "/mysql.cnf"), "/etc/mysql/conf.d/myconf.cnf");
     waitingFor(new LogMessageWaitStrategy().withRegEx("ready for connections"));
-
-    extraConfig.accept(this);
     if (imageName.endsWith(":latest")) {
       withImagePullPolicy(PullPolicy.alwaysPull());
     }
+    extraConfig.accept(this);
+    
     start();
-    log.info("MrdsTestContainer started at {}", getJdbcUrl());
+    log.info("mysqlTestContainer started at {}", getJdbcUrl());
   }
 
   @Override
@@ -82,12 +82,12 @@ public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer>
       final Environment env = ctx.getEnvironment();
       if (instance == null) {
         //        PropertySource<?> dataSourceProperties =
-        //            env.getPropertySources().get("test.containers.mrds.datasource");
-        final boolean reUse = Boolean.parseBoolean(env.getProperty("test.containers.mrds.reuse"));
+        //            env.getPropertySources().get("test.containers.mysql.datasource");
+        final boolean reuse = Boolean.parseBoolean(env.getProperty("test.containers.db.reuse"));
 
-        instance = new MySqlTestContainer(env, container -> container.withReuse(reUse));
+        instance = new MySqlTestContainer(env, container -> container.withReuse(reuse));
 
-        System.setProperty("test.containers.mrds.datasource.url", instance.getJdbcUrl());
+        System.setProperty("test.containers.mysql.datasource.url", instance.getJdbcUrl());
       }
 
       // Programmatically register the container as a bean so it can be injected
@@ -95,7 +95,7 @@ public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer>
       if (!beanFactory.containsBean(MySqlTestContainer.class.getName())) {
         beanFactory.registerSingleton(MySqlTestContainer.class.getName(), instance);
         TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
-            ctx, "test.containers.mrds.datasource.url=" + instance.getJdbcUrl());
+            ctx, "test.containers.mysql.datasource.url=" + instance.getJdbcUrl());
       }
     }
 

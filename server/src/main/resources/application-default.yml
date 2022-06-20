@@ -17,12 +17,9 @@ spring:
     import:
     - classpath:application-server.yml
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/XE
-    username: cm_jobs
+    url: jdbc:mysql://localhost:3306/test
+    username: test
     password: password
-    v1:
-      username: cm_test
-      password: password
   jpa:
     generate-ddl: true
     hibernate:

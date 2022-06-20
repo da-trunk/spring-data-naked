@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Consumer;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,100 +22,99 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.support.TestPropertySourceUtils;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.InternetProtocol;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
 /**
- * Deploys a war and starts a server implementation within the ROOT context of a Tomcat container
- * running inside of a Docker container.
+ * Deploys a war and starts a server implementation within the ROOT context of a
+ * Tomcat container running inside of a Docker container.
  */
-public class TomcatTestContainer extends GenericContainer<TomcatTestContainer>
-    implements SpringTestContainer {
+public class TomcatTestContainer extends GenericContainer<TomcatTestContainer> implements SpringTestContainer {
   private static final Logger log = LogManager.getLogger();
 
-  private final UriComponents baseUri;
+  private URI baseUri;
+  private final String springDataRestBasePath;
 
-  public TomcatTestContainer(
-      final @Nonnull Environment environment,
-      Consumer<TomcatTestContainer> extraConfig,
-      String dbUrl) {
+  public TomcatTestContainer(final @Nonnull Environment environment) {
     super(DockerImageName.parse("tomcat:9-jdk8-adoptopenjdk-hotspot"));
     withNetwork(SpringTestContainers.getNetwork());
-    withExposedPorts(8080);
+    withNetworkAliases("tomcat");
+    OptionalInt hostPort = SpringTestContainer.getPort("tomcat", environment);
+    if (hostPort.isEmpty()) {
+      withExposedPorts(8080);
+      withReuse(false);
+    } else {
+      addFixedExposedPort(hostPort.getAsInt(), 8080, InternetProtocol.TCP);
+      withReuse(true);
+    }
     copyFilesToContainer(environment);
-    waitingFor(
-        Wait.forLogMessage(
-            ".*\\[main\\] org\\.apache\\.catalina\\.startup\\.Catalina\\.start Server startup in \\[\\d+\\] milliseconds\\n",
-            1));
+    waitingFor(Wait.forLogMessage(
+        ".*\\[main\\] org\\.apache\\.catalina\\.startup\\.Catalina\\.start Server startup in \\[\\d+\\] milliseconds\\n", 1));
+    springDataRestBasePath = environment.getProperty("spring.data.rest.base-path");
+  }
 
-    start();
+  public void start() {
+    super.start();
     int port = getMappedPort(8080);
-    baseUri =
-        UriComponentsBuilder.newInstance()
-            .scheme("http")
-            .host(getHost())
-            .port(port)
-            .path("")
-            .build();
+    baseUri = UriComponentsBuilder.newInstance().scheme("http").host(getHost()).port(port).path("").build().toUri();
     log.info("Server started at [{}]", baseUri.toString());
   }
 
   /**
-   * Uses Spring environment variables to locate a war file and conf directory which should be
-   * accessible within the container before it is started. Certain variables must be present in the
-   * {@link Environment}. Add a resource file to the test classpath which defines these properties.
-   * Override this method to provide a custom implementation.
+   * Uses Spring environment variables to locate a war file and conf directory
+   * which should be accessible within the container before it is started. Certain
+   * variables must be present in the {@link Environment}. Add a resource file to
+   * the test classpath which defines these properties. Override this method to
+   * provide a custom implementation.
    *
    * @param environment the Spring {@link Environment}
    */
   protected void copyFilesToContainer(final @Nonnull Environment environment) {
-    String prefix = "test.containers.tomcat.application.";
-    @Nonnull String baseDir = environment.getProperty(prefix + "buildDir");
-    assertThat(baseDir).isNotEmpty();
-    assertThat(baseDir).doesNotStartWith("@");
-    @Nonnull String warFileName = environment.getProperty(prefix + "warName");
-    assertThat(warFileName).isNotEmpty();
-    assertThat(warFileName).doesNotStartWith("@");
-    Path warPath = Paths.get(baseDir, warFileName);
-    Path confPath = Paths.get(baseDir, "test-classes", "conf");
+    String prefix = "test.containers.tomcat.config.";
+    @Nonnull
+    String warPathStr = environment.getProperty(prefix + "war-path");
+    assertThat(warPathStr).isNotEmpty();
+    assertThat(warPathStr).doesNotStartWith("@");
+    @Nonnull
+    String confPathStr = environment.getProperty(prefix + "conf-path");
+    assertThat(confPathStr).isNotEmpty();
+    assertThat(confPathStr).doesNotStartWith("@");
+    Path confPath = Paths.get(confPathStr);
 
-    log.info("Copying war from [{}] to container", warPath);
-    withCopyFileToContainer(forHostPath(warPath), "/usr/local/tomcat/webapps/ROOT.war");
+    log.info("Copying war from [{}] to container", warPathStr);
+    withCopyFileToContainer(forHostPath(Paths.get(warPathStr)), "/usr/local/tomcat/webapps/ROOT.war");
     log.info("Copying [{}/server.xml] to container", confPath);
-    withCopyFileToContainer(
-        forHostPath(confPath, "server.xml"), "/usr/local/tomcat/conf/server.xml");
+    withCopyFileToContainer(forHostPath(confPath, "server.xml"), "/usr/local/tomcat/conf/server.xml");
     log.info("Copying [{}/tomcat-users.xml] to container", confPath);
-    withCopyFileToContainer(
-        forHostPath(confPath, "tomcat-users.xml"), "/usr/local/tomcat/conf/tomcat-users.xml");
-    log.info("Copying [{}/context.xml] to container", confPath);
-    withCopyFileToContainer(
-        forHostPath(confPath, "/context.xml"),
-        "/usr/local/tomcat/webapps/manager/META-INF/context.xml");
+    withCopyFileToContainer(forHostPath(confPath, "tomcat-users.xml"), "/usr/local/tomcat/conf/tomcat-users.xml");
+//    log.info("Copying [{}/context.xml] to container", confPath);
+//    withCopyFileToContainer(forHostPath(confPath, "/context.xml"), "/usr/local/tomcat/webapps/manager/META-INF/context.xml");
     log.info("Copying [{}/Catalina/localhost/] to container", confPath);
-    withCopyFileToContainer(
-        forHostPath(confPath, "/Catalina/localhost/"), "/usr/local/tomcat/conf/Catalina/localhost");
+    withCopyFileToContainer(forHostPath(confPath, "/Catalina/localhost/"), "/usr/local/tomcat/conf/Catalina/localhost");
   }
 
   MountableFile forHostPath(Path basePath, String... strComponents) {
     Path path = Paths.get(basePath.toAbsolutePath().toString(), strComponents);
     assertThat(path).exists();
-    String strPath =
-        Stream.concat(Stream.of(basePath.toAbsolutePath().toString()), Stream.of(strComponents))
-            .collect(Collectors.joining("/"));
+    String strPath = Stream.concat(Stream.of(basePath.toAbsolutePath().toString()), Stream.of(strComponents))
+        .collect(Collectors.joining("/"));
     return MountableFile.forHostPath(strPath);
   }
 
-  public URI getBaseUrl() {
-    return baseUri.toUri();
+  public URI getBaseUri() {
+    UriComponentsBuilder result = UriComponentsBuilder.fromUri(baseUri);
+    if (springDataRestBasePath != null) {
+      result.pathSegment(springDataRestBasePath);
+    }
+    return result.build().toUri();
   }
 
   @Order(Ordered.LOWEST_PRECEDENCE)
-  public static class Factory
-      implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+  public static class Factory implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     private static TomcatTestContainer instance = null;
 
     @Override
@@ -127,26 +126,29 @@ public class TomcatTestContainer extends GenericContainer<TomcatTestContainer>
     private static void create(ConfigurableApplicationContext ctx) {
       final Environment env = ctx.getEnvironment();
       if (instance == null) {
-        @Nonnull
-        boolean reUse = Boolean.parseBoolean(env.getProperty("application.container.reuse"));
-        final String jdbcUrl = env.getProperty("test.containers.mapping.datasource.url");
-
-        instance = new TomcatTestContainer(env, container -> container.withReuse(reUse), jdbcUrl);
-
-        System.setProperty("URL", instance.getBaseUrl().toASCIIString());
+        instance = new TomcatTestContainer(env);
+        String url = env.getProperty("test.containers.tomcat.url");
+        if (url == null) {
+          instance.start();
+          url = instance.getBaseUri().toASCIIString();
+          System.setProperty("test.containers.tomcat.url", url);
+          log.info("TomcatTestContainer connecting to {}", instance.getBaseUri());
+        } else {
+          instance.baseUri = URI.create(url);
+          log.info("TomcatTestContainer connecting to {}", instance.getBaseUri());
+        }
       }
 
       // Programmatically register the container as a bean so it can be injected
       ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
       if (!beanFactory.containsBean(TomcatTestContainer.class.getName())) {
         beanFactory.registerSingleton(TomcatTestContainer.class.getName(), instance);
-        UriComponentsBuilder restUri = UriComponentsBuilder.fromUri(instance.getBaseUrl());
-        String springDataRestBasePath = env.getProperty("spring.data.rest.base-path");
-        if (springDataRestBasePath != null) {
-          restUri.pathSegment(springDataRestBasePath);
-        }
-        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
-            ctx, "client.repo.location=" + restUri.build().toUri().toASCIIString());
+//        UriComponentsBuilder restUri = UriComponentsBuilder.fromUri(instance.getBaseUri());
+//        String springDataRestBasePath = env.getProperty("spring.data.rest.base-path");
+//        if (springDataRestBasePath != null) {
+//          restUri.pathSegment(springDataRestBasePath);
+//        }
+        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(ctx, "client.repo.location=" + instance.getBaseUri().toASCIIString());
       }
     }
 

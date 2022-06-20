@@ -11,15 +11,10 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:oracle:thin:@code-mapping-database:1521/XE
-    username: cm_jobs
+    # url: jdbc:oracle:thin:@test:1521/XE
+    url: jdbc:mysql://mysql:3306/test
+    username: test
     password: password
-    v1:
-      username: cm_test
-      password: password
-    container:
-      image: docker-snapshot.cernerrepos.net/si-mapping/si-jobs-database:0.7.9
-      reuse: false
   application.admin.enabled: true
   liquibase:
     enabled: false

@@ -81,6 +81,7 @@
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>**.yml</include>
+					<include>**.cnf</include>
 				</includes>
 			</resource>
 		</resources>

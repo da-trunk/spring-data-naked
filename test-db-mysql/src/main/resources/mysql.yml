@@ -1,13 +1,15 @@
 test:
   containers:
-    db:
+    mysql:
       image: mysql:8.0.29
-      reuse: false
+      config: '@project.build.directory@/classes/mysql.cnf'
+      # config: '@project.basedir@/src/main/resources/mysql.cnf'
+      # port: 3306
       datasource:
         username: test
         password: password
-      application:
-        build-dir: '@project.build.directory@/classes'
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        #url: jdbc:mysql://localhost:3306/test
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -19,6 +21,3 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     properties.hibernate:
       jdbc.time_zone: UTC
-#logging:
-#  level:
-#    com.mysql.cj.jdbc: trace

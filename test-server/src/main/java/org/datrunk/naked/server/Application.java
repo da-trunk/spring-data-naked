@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.datest.naked.test.entities.User;
+import org.datrunk.naked.entities.User;
 import org.datrunk.naked.entities.config.CollectionDTOConverter;
 import org.datrunk.naked.server.config.ApplicationContextProvider;
 import org.datrunk.naked.server.config.JerseyConfig;

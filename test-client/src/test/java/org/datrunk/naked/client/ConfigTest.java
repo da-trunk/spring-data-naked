@@ -2,8 +2,8 @@ package org.datrunk.naked.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.datest.naked.test.entities.User;
 import org.datrunk.naked.client.config.Config;
+import org.datrunk.naked.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;

@@ -1,4 +1,4 @@
-package org.datest.naked.test.entities;
+package org.datrunk.naked.entities;
 
 public enum Role {
     Admin, User;

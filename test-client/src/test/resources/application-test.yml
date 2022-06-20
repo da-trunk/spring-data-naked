@@ -1,20 +1,21 @@
 debug: false
 test:
   containers:
-    db:
+    mysql:
       image: mysql:8.0.29
-      reuse: false
+      #port: 3306
+      config: '@project.build.directory@/classes/mysql.cnf'
       datasource:
         username: test
         password: password
-      application:
-        build-dir: '@project.build.directory@'
+        #url: jdbc:mysql://localhost:3306/test
     tomcat:
       image: tomcat:9-jdk8-adoptopenjdk-hotspot
-      reuse: false
-      application:
-        build-dir: '@project.build.directory@'
-        war-name: ROOT.war
+      #port: 9080
+      #url:  http://localhost:9080/api
+      config:
+        war-path: '@project.build.directory@/ROOT.war'
+        conf-path: '@project.build.directory@/WEB-INF/classes/conf'
     server:
       image: jdk:latest
       reuse: false
@@ -24,6 +25,9 @@ client:
   repo:
     location: http://localhost:9080/api
 spring:
+  data:
+    rest:
+      base-path: api
 #  config:
 #    import:
 #    - classpath:application-server.yml
@@ -32,8 +36,8 @@ spring:
 #    generate-ddl: true
 #    hibernate:
 #      ddl-auto: update
-#  liquibase:
-#    enabled: false
+  liquibase:
+    enabled: false
 #    change-log: classpath:liquibase/changelog-test.xml
 #    contexts: test
 #    dropFirst: false

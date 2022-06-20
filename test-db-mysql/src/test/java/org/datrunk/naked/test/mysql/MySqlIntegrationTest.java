@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
+import javax.transaction.Transactional;
 
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
 import org.datrunk.naked.db.mysql.MySqlTestContainer;
@@ -24,9 +24,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import liquibase.exception.LiquibaseException;
 import lombok.Data;
@@ -40,21 +42,15 @@ import lombok.RequiredArgsConstructor;
 @EnableConfigurationProperties(DataSourceProperties.class)
 @ActiveProfiles("test")
 class MySqlIntegrationTest {
-  private static boolean USE_TESTCONTAINERS = true;
-  // @ActiveProfiles("test-fixed")
-  // class IntegrationTest {
-  // private static boolean USE_TESTCONTAINERS = false;
-
+  @Configuration
   @EnableAutoConfiguration
+  @EnableTransactionManagement
   public static class Config {
     boolean initialized = false;
 
     @Bean
     public DataSource dataSource(MySqlTestContainer db) throws LiquibaseException, SQLException {
       if (!initialized) {
-//        db.updateAsSys("liquibase/mysql/init.xml");
-//        db.update("liquibase/mysql/schema-update-versioned.xml");
-//        db.update("liquibase/mysql/content/master.xml");
         initialized = true;
       }
       return db.getDataSource();
@@ -70,17 +66,16 @@ class MySqlIntegrationTest {
 
   @BeforeAll
   void before() throws Exception {
-    if (USE_TESTCONTAINERS) {
-      assertThat(db).isNotNull();
-    }
+    assertThat(db).isNotNull();
   }
 
+  @Transactional
   @Test
   void getYValues() throws Exception {
-    db.executeUpdate("create table points (x int, y int)");
-    db.executeUpdate("insert into points values (1,2)");
+//    db.executeUpdate("create table points (x int, y int)");
+    db.executeUpdate("insert into points values (4,4)");
     List<Point> actual = Point.findByX(db, 1);
-    assertThat(actual).containsOnly(new Point(1, 2));
+    assertThat(actual).containsOnly(new Point(2, 3));
   }
 
   @Data

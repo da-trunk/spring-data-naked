@@ -13,15 +13,6 @@
 		<module>entities</module>
 		<module>server</module>
 		<module>client</module>
-		<module>test-client</module>
-		<module>test-server</module>
-		<module>test-entities</module>
-		<module>test-db-oracle</module>
-		<module>test-db-h2</module>
-		<module>test-db-postgres</module>
-		<module>test-db</module>
-		<module>test-db-mysql</module>
-		<module>test-server-tomcat</module>
-		<module>test-common</module>
+		<module>test</module>
 	</modules>
 </project>

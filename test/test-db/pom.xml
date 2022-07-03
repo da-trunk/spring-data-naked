@@ -11,7 +11,7 @@
 	<artifactId>test-db-aggregator</artifactId>
 	<packaging>pom</packaging>
 	<modules>
-		<module>test-db</module>
+		<module>test-db-common</module>
 		<module>test-db-oracle</module>
 		<module>test-db-h2</module>
 		<module>test-db-postgres</module>

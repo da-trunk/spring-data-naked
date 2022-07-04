@@ -38,6 +38,7 @@ public class TomcatTestContainer extends GenericContainer<TomcatTestContainer> i
 
   private URI baseUri;
   private final String springDataRestBasePath;
+  private final Environment environment;
 
   public TomcatTestContainer(final @Nonnull Environment environment) {
     super(DockerImageName.parse("tomcat:9-jdk8-adoptopenjdk-hotspot"));
@@ -51,13 +52,17 @@ public class TomcatTestContainer extends GenericContainer<TomcatTestContainer> i
       addFixedExposedPort(hostPort.getAsInt(), 8080, InternetProtocol.TCP);
       withReuse(true);
     }
-    copyFilesToContainer(environment);
-    waitingFor(Wait.forLogMessage(
-        ".*\\[main\\] org\\.apache\\.catalina\\.startup\\.Catalina\\.start Server startup in \\[\\d+\\] milliseconds\\n", 1));
+    // Delay copyFilesToContainer until just before start in order to save time if
+    // we're attaching to an already running container
+    this.environment = environment;
     springDataRestBasePath = environment.getProperty("spring.data.rest.base-path");
   }
 
+  @Override
   public void start() {
+    copyFilesToContainer(environment);
+    waitingFor(Wait.forLogMessage(
+        ".*\\[main\\] org\\.apache\\.catalina\\.startup\\.Catalina\\.start Server startup in \\[\\d+\\] milliseconds\\n", 1));
     super.start();
     int port = getMappedPort(8080);
     baseUri = UriComponentsBuilder.newInstance().scheme("http").host(getHost()).port(port).path("").build().toUri();
@@ -84,15 +89,12 @@ public class TomcatTestContainer extends GenericContainer<TomcatTestContainer> i
     assertThat(confPathStr).isNotEmpty();
     assertThat(confPathStr).doesNotStartWith("@");
     Path confPath = Paths.get(confPathStr);
-
     log.info("Copying war from [{}] to container", warPathStr);
     withCopyFileToContainer(forHostPath(Paths.get(warPathStr)), "/usr/local/tomcat/webapps/ROOT.war");
     log.info("Copying [{}/server.xml] to container", confPath);
     withCopyFileToContainer(forHostPath(confPath, "server.xml"), "/usr/local/tomcat/conf/server.xml");
     log.info("Copying [{}/tomcat-users.xml] to container", confPath);
     withCopyFileToContainer(forHostPath(confPath, "tomcat-users.xml"), "/usr/local/tomcat/conf/tomcat-users.xml");
-//    log.info("Copying [{}/context.xml] to container", confPath);
-//    withCopyFileToContainer(forHostPath(confPath, "/context.xml"), "/usr/local/tomcat/webapps/manager/META-INF/context.xml");
     log.info("Copying [{}/Catalina/localhost/] to container", confPath);
     withCopyFileToContainer(forHostPath(confPath, "/Catalina/localhost/"), "/usr/local/tomcat/conf/Catalina/localhost");
   }

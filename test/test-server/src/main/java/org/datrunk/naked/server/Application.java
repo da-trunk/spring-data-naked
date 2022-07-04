@@ -17,6 +17,7 @@ import org.datrunk.naked.server.repo.UserRepo;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -42,46 +43,62 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 @SpringBootApplication
-// @Configuration
-// @EnableAutoConfiguration
-@EnableConfigurationProperties({AppDetails.class, TomcatConnectionProperties.class})
-// @ComponentScan({})
-@Import({Application.Config.class})
-@PropertySources({
-  @PropertySource("classpath:application-server.yml"),
-  @PropertySource("classpath:application-default.yml")
-})
+@Import({ Application.Config.class })
+@PropertySources({ @PropertySource("classpath:application-server.yml"), @PropertySource("classpath:application-default.yml") })
 public class Application extends SpringBootServletInitializer {
   private static Logger log = LogManager.getLogger();
 
   @SpringBootConfiguration
-  @EntityScan(basePackageClasses = {User.class})
-  @EnableJpaRepositories(
-      basePackageClasses = {UserRepo.class},
-      repositoryBaseClass = BaseRepositoryImpl.class,
-      considerNestedRepositories = true)
-  @ComponentScan(basePackageClasses = {BatchRestRepo.class, CollectionDTOConverter.class})
+  @EntityScan(basePackageClasses = { User.class })
+  @EnableJpaRepositories(basePackageClasses = {
+      UserRepo.class }, repositoryBaseClass = BaseRepositoryImpl.class, considerNestedRepositories = true)
+  @ComponentScan(basePackageClasses = { BatchRestRepo.class, CollectionDTOConverter.class })
   @EnableHypermediaSupport(type = HypermediaType.HAL)
   @EnableAspectJAutoProxy
   @EnableTransactionManagement
-  @EnableConfigurationProperties
+  @EnableConfigurationProperties({ AppDetails.class, TomcatConnectionProperties.class })
+  @EnableAutoConfiguration
   public static class Config {
     @Bean
     public RepositoryRestConfigurer repositoryRestConfigurer(EntityManager entityManager) {
-      return RepositoryRestConfigurer.withConfig(
-          config -> {
-            config.exposeIdsFor(
-                entityManager.getMetamodel().getEntities().stream()
-                    .map(javax.persistence.metamodel.Type::getJavaType)
-                    .toArray(Class[]::new));
-            // assert(config.getBasePath().equals(URI.create("/api")));
-          });
+      return RepositoryRestConfigurer.withConfig(config -> {
+        config.exposeIdsFor(
+            entityManager.getMetamodel().getEntities().stream().map(javax.persistence.metamodel.Type::getJavaType).toArray(Class[]::new));
+      });
     }
+
+    @Bean
+    public com.fasterxml.jackson.databind.Module javaTimeModule() {
+      JavaTimeModule module = new JavaTimeModule();
+      return module;
+    }
+
+//    @Bean
+//    public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
+//        return builder -> builder.
+//          .serializers(LOCAL_DATETIME_SERIALIZER);
+//    }
+//    
+//    @Bean
+//    @Primary
+//    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+//        ObjectMapper objectMapper = builder.build();
+//        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+//        return objectMapper;
+//    }
+    
+//    @Bean
+//    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
+//      return new Jackson2ObjectMapperBuilder().modules(new JavaTimeModule()).serializationInclusion(Include.NON_NULL);
+//    }
 
     // @Bean
     // public SpringDataRestTransactionAspect
-    // springDataRestTransactionAspect(PlatformTransactionManager transactionManager) {
+    // springDataRestTransactionAspect(PlatformTransactionManager
+    // transactionManager) {
     // return new SpringDataRestTransactionAspect(transactionManager);
     // }
 
@@ -131,17 +148,13 @@ public class Application extends SpringBootServletInitializer {
 
   @Primary
   @Bean(destroyMethod = "close")
-  public DataSource primaryDataSource(
-      DataSourceProperties properties, TomcatConnectionProperties tomcatProperties) {
+  public DataSource primaryDataSource(DataSourceProperties properties, TomcatConnectionProperties tomcatProperties) {
     log.info("Connecting to [{}] at [{}]", properties.getUsername(), properties.getUrl());
 
     @SuppressWarnings("cast")
-    org.apache.tomcat.jdbc.pool.DataSource dataSource =
-        (org.apache.tomcat.jdbc.pool.DataSource)
-            properties
-                .initializeDataSourceBuilder()
-                .type(org.apache.tomcat.jdbc.pool.DataSource.class)
-                .build();
+    org.apache.tomcat.jdbc.pool.DataSource dataSource = (org.apache.tomcat.jdbc.pool.DataSource) properties.initializeDataSourceBuilder()
+        .type(org.apache.tomcat.jdbc.pool.DataSource.class)
+        .build();
 
     DatabaseDriver databaseDriver = DatabaseDriver.fromJdbcUrl(properties.determineUrl());
     String validationQuery = databaseDriver.getValidationQuery();
@@ -159,21 +172,31 @@ public class Application extends SpringBootServletInitializer {
   /*
    * @Bean(destroyMethod = "close")
    *
-   * @SecondaryDataSource public DataSource secondaryDataSource(DataSourceProperties properties, TomcatConnectionProperties
-   * tomcatProperties,
+   * @SecondaryDataSource public DataSource
+   * secondaryDataSource(DataSourceProperties properties,
+   * TomcatConnectionProperties tomcatProperties,
    *
-   * @Value("${spring.datasource.secondary.username}") String userName, @Value("${spring.datasource.secondary.password}") String password)
-   * { String url = properties.getUrl() .replace(properties.getUsername(), userName) .replace(properties.getPassword(), password);
+   * @Value("${spring.datasource.secondary.username}") String
+   * userName, @Value("${spring.datasource.secondary.password}") String password)
+   * { String url = properties.getUrl() .replace(properties.getUsername(),
+   * userName) .replace(properties.getPassword(), password);
    * log.info("Connecting to [{}] at [{}]", userName, url);
    *
-   * @SuppressWarnings("cast") org.apache.tomcat.jdbc.pool.DataSource dataSource = (org.apache.tomcat.jdbc.pool.DataSource)
-   * properties.initializeDataSourceBuilder() .type(org.apache.tomcat.jdbc.pool.DataSource.class) .url(url) .username(userName)
-   * .password(password) .build();
+   * @SuppressWarnings("cast") org.apache.tomcat.jdbc.pool.DataSource dataSource =
+   * (org.apache.tomcat.jdbc.pool.DataSource)
+   * properties.initializeDataSourceBuilder()
+   * .type(org.apache.tomcat.jdbc.pool.DataSource.class) .url(url)
+   * .username(userName) .password(password) .build();
    *
-   * DatabaseDriver databaseDriver = DatabaseDriver.fromJdbcUrl(properties.determineUrl()); String validationQuery =
-   * databaseDriver.getValidationQuery(); if (validationQuery != null) { dataSource.setTestOnBorrow(true);
-   * dataSource.setValidationQuery(validationQuery); dataSource.setValidationQueryTimeout(tomcatProperties.getValidationQueryTimeout()); }
-   * dataSource.setMaxActive(tomcatProperties.getMaxActive()); dataSource.setMaxWait(tomcatProperties.getMaxWait());
+   * DatabaseDriver databaseDriver =
+   * DatabaseDriver.fromJdbcUrl(properties.determineUrl()); String validationQuery
+   * = databaseDriver.getValidationQuery(); if (validationQuery != null) {
+   * dataSource.setTestOnBorrow(true);
+   * dataSource.setValidationQuery(validationQuery);
+   * dataSource.setValidationQueryTimeout(tomcatProperties.
+   * getValidationQueryTimeout()); }
+   * dataSource.setMaxActive(tomcatProperties.getMaxActive());
+   * dataSource.setMaxWait(tomcatProperties.getMaxWait());
    * dataSource.setMaxIdle(tomcatProperties.getMaxIdle()); return dataSource; }
    */
 

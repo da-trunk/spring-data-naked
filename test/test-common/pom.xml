@@ -4,7 +4,7 @@
     <groupId>org.datrunk.naked</groupId>
     <artifactId>sdn-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <relativePath>../sdn-parent/pom.xml</relativePath>
+    <relativePath>../../sdn-parent/pom.xml</relativePath>
   </parent>
   <artifactId>test-common</artifactId>
   <properties>

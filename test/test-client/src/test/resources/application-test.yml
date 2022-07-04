@@ -4,15 +4,15 @@ test:
     mysql:
       image: mysql:8.0.29
       #port: 3306
-      config: '@project.build.directory@/classes/mysql.cnf'
+      config: '@project.build.directory@/mysql.cnf'
       datasource:
         username: test
         password: password
-        #url: jdbc:mysql://localhost:3306/test
+        url: jdbc:mysql://localhost:3306/test
     tomcat:
       image: tomcat:9-jdk8-adoptopenjdk-hotspot
       #port: 9080
-      #url:  http://localhost:9080/api
+      url:  http://localhost:9080
       config:
         war-path: '@project.build.directory@/ROOT.war'
         conf-path: '@project.build.directory@/WEB-INF/classes/conf'

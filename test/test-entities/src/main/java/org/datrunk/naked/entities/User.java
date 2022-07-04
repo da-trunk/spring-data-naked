@@ -15,9 +15,13 @@ import javax.persistence.InheritanceType;
 
 import org.datrunk.naked.entities.IdClass;
 import org.datrunk.naked.entities.bowman.annotation.RemoteResource;
+import org.datrunk.naked.entities.random.Randomizer;
+import org.datrunk.naked.entities.random.RepeatingRandomizer;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.lang.NonNull;
+
+import com.github.javafaker.Name;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,13 +38,13 @@ import lombok.ToString;
 //@Table(schema = "PUBLIC")
 @Inheritance(strategy = InheritanceType.JOINED)
 @ToString
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public class User extends IdClass<Long> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(insertable = false, updatable = false)
-  private Long id;  
-  
+  private Long id;
+
 //  public String getId() {
 //    return String.format("%s %s", firstName, lastName);
 //  }
@@ -53,7 +57,7 @@ public class User extends IdClass<Long> {
 
   @Nonnull
   private String firstName;
-  
+
   @Nonnull
   private String lastName;
 

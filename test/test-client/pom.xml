@@ -4,7 +4,7 @@
 		<artifactId>sdn-parent</artifactId>
 		<groupId>org.datrunk.naked</groupId>
 		<version>0.1-SNAPSHOT</version>
-		<relativePath>../sdn-parent/pom.xml</relativePath>
+		<relativePath>../../sdn-parent/pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -109,21 +109,12 @@
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<destFileName>ROOT.war</destFileName>
 								</artifactItem>
-								<!--	<artifactItem>
-									<groupId>org.datrunk.naked</groupId>
-									<artifactId>test-server</artifactId>
-									<version>0.1-SNAPSHOT</version>
-									<type>jar</type>
-									<includes>**/conf/*.xml</includes>
-									<outputDirectory>${project.build.directory}/classes</outputDirectory>
-								</artifactItem>-->
 							</artifactItems>
 						</configuration>
 					</execution>
 					<execution>
 						<id>prepare-test-server-conf</id>
 						<phase>generate-test-resources</phase>
-						<!--<phase>package</phase>-->
 						<goals>
 							<goal>unpack</goal>
 						</goals>
@@ -135,63 +126,34 @@
 									<version>0.1-SNAPSHOT</version>
 									<type>war</type>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 							<includes>**/conf/**</includes>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
-							<!--							<groupId>org.datrunk.naked</groupId>
-							<includeArtifactIds>test-server</includeArtifactIds>
-							<includes>conf/**</includes>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
-							<overWriteSnapshots>true</overWriteSnapshots>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
 					<execution>
-						<id>artifact-dependencies</id>
+						<id>prepare-mysql-conf</id>
 						<phase>generate-test-resources</phase>
 						<goals>
-							<goal>unpack-dependencies</goal>
+							<goal>unpack</goal>
 						</goals>
 						<configuration>
-							<groupId>org.datrunk.naked</groupId>
-							<includeArtifactIds>test-db-mysql</includeArtifactIds>
-							<includes>mysql.cnf</includes>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
-							<overWriteSnapshots>true</overWriteSnapshots>-->
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.datrunk.naked</groupId>
+									<artifactId>test-db-mysql</artifactId>
+									<version>0.1-SNAPSHOT</version>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+								</artifactItem>
+							</artifactItems>
+							<includes>**/mysql.cnf</includes>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-<!--			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>copy-tomcat-resources</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/test-classes/conf</outputDirectory>
-							<overwrite>true</overwrite>
-							<resources>
-								<resource>
-									<filtering>true</filtering>
-									<directory>../test-server/src/main/resources/conf</directory>
-									<includes>
-										<include>server.xml</include>
-										<include>tomcat-users.xml</include>
-										<include>context.xml</include>
-										<include>Catalina/**</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>-->
 		</plugins>
 	</build>
 </project>

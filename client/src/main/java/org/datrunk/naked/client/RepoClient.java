@@ -282,6 +282,13 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
     public Collection<T> persist(T first, @SuppressWarnings("unchecked") T... others) {
         return persist(Lists.asList(first, others));
     }
+    
+    public List<T> clear() {
+      List<T> copy = new ArrayList<>();
+      copy.addAll(queue.getEntities());
+      queue.clear();
+      return copy;
+    }
 
     public List<T> flush() {
         CollectionModel<EntityModel<T>> result = client.saveAll(queue);
@@ -301,6 +308,7 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
         return flushed;
     }
 
+    @Deprecated
     public List<T> saveAllObsolete(List<T> entities) throws JsonProcessingException {
         try {
             final String json = new ObjectMapper().writeValueAsString(queue);

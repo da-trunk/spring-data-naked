@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    container:
+      image: oracle-xe:21.3.0
+      type: xe21
+      port: 1521
+    username: test
+    password: test
+    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+logging:
+  level:
+    root: warn
+    org.datrunk.naked: trace
+    

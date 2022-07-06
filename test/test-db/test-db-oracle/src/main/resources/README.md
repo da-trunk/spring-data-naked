@@ -1,3 +1,14 @@
+# Create Database
+
+```sh
+sqlplus sys/password@localhost as sysdba
+SQL> ALTER SESSION SET CONTAINER=XEPDB1;
+SQL> CREATE USER TEST IDENTIFIED BY password QUOTA UNLIMITED ON USE
+SQL> GRANT CONNECT, RESOURCE, CREATE SESSION, create table TO TEST;
+SQL> quit
+sqlplus test/test@//localhost/XEPDB1
+```
+
 # Compare entities to dev and generate changeset to migrate dev to entities
 
 `mvn liquibase:diff`

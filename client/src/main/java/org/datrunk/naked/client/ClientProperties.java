@@ -20,7 +20,7 @@ public abstract class ClientProperties {
     private String location;
     @Getter
     private String batchPath = "/batch";
-    private List<String> retrySleepDurations = Lists.newArrayList("0");
+    private List<String> retrySleepDurations = Lists.newArrayList();
     private OAuth oauth = null;
 
     @Data

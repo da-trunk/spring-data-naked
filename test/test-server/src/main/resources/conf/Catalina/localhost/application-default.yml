@@ -11,8 +11,8 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    # url: jdbc:oracle:thin:@test:1521/XE
-    url: jdbc:mysql://mysql:3306/test
+    # url: jdbc:oracle:thin:@db:1521/XE
+    url: jdbc:mysql://db:3306/test
     username: test
     password: password
   application.admin.enabled: true

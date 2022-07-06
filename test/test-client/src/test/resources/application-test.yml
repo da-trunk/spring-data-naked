@@ -1,37 +1,46 @@
 debug: false
 test:
   containers:
-    mysql:
-      image: mysql:8.0.29
+   # mysql:
+   #   image: mysql:8.0.29
       #port: 3306
-      config: '@project.build.directory@/mysql.cnf'
-      datasource:
-        username: test
-        password: password
-        url: jdbc:mysql://localhost:3306/test
+   #   config: '@project.build.directory@/mysql.cnf'
+   #   datasource:
+   #     username: test
+   #     password: password
+   #     url: jdbc:mysql://localhost:3306/test
     tomcat:
       image: tomcat:9-jdk8-adoptopenjdk-hotspot
-      #port: 9080
-      url:  http://localhost:9080
+      port: 9080
+      #url:  http://localhost:9080
       config:
         war-path: '@project.build.directory@/ROOT.war'
         conf-path: '@project.build.directory@/WEB-INF/classes/conf'
-    server:
-      image: jdk:latest
-      reuse: false
-      application:
-        exe-dir: '@project.build.directory@/test-server'
+    #server:
+    #  image: jdk:latest
+    #  reuse: false
+    #  application:
+    #    exe-dir: '@project.build.directory@/test-server'
 client:
   repo:
     location: http://localhost:9080/api
 spring:
+  config:
+    import:
+    - classpath:mysql.yml
+#    - classpath:application-server.yml
+#    - optional:classpath:application.yml
+  datasource:
+    container:
+      image: oracle-xe:21.3.0
+      type: xe21
+      port: 1521
+    username: test
+    password: test
+    url: jdbc:oracle:thin:@localhost:1521/XEPDB1  
   data:
     rest:
       base-path: api
-#  config:
-#    import:
-#    - classpath:application-server.yml
-#    - optional:classpath:application.yml
 #  jpa:
 #    generate-ddl: true
 #    hibernate:

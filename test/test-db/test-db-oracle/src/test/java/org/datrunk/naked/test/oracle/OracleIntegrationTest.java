@@ -1,6 +1,7 @@
-package org.datrunk.naked.test.mysql;
+package org.datrunk.naked.test.oracle;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,8 +10,8 @@ import java.util.List;
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
 
+import org.datrunk.naked.db.OracleTestContainer;
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
-import org.datrunk.naked.db.mysql.MySqlTestContainer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -33,15 +34,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import liquibase.exception.LiquibaseException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ExtendWith({ SpringExtension.class })
 @TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(initializers = { MySqlTestContainer.Factory.class }, classes = { MySqlIntegrationTest.Config.class })
+@ContextConfiguration(initializers = { OracleTestContainer.Factory.class }, classes = { OracleIntegrationTest.Config.class })
 @EnableConfigurationProperties(DataSourceProperties.class)
 @ActiveProfiles("test")
-class MySqlIntegrationTest {
+@Log4j2
+class OracleIntegrationTest {
   @Configuration
   @EnableAutoConfiguration
   @EnableTransactionManagement
@@ -49,7 +52,7 @@ class MySqlIntegrationTest {
     boolean initialized = false;
 
     @Bean
-    DataSource dataSource(MySqlTestContainer db) throws LiquibaseException, SQLException {
+    DataSource dataSource(OracleTestContainer db) throws LiquibaseException, SQLException {
       if (!initialized) {
         initialized = true;
       }
@@ -60,8 +63,8 @@ class MySqlIntegrationTest {
   private DataSourceWrapper db;
 
   @Autowired
-  void setDataSource(MySqlTestContainer mySql) {
-    db = mySql.getDataSourceWrapper();
+  void setDataSource(OracleTestContainer db) {
+    this.db = db.getDataSourceWrapper();
   }
 
   @BeforeAll
@@ -72,7 +75,11 @@ class MySqlIntegrationTest {
   @Transactional
   @Test
   void getYValues() throws Exception {
-    db.executeUpdate("create table if not exists points (x int, y int)");
+    try {
+    db.executeUpdate("create table points (x number primary key, y number)");
+    } catch (Exception e) {
+      log.catching(e);
+    }
     db.executeUpdate("insert into points values (1,1)");
     db.executeUpdate("insert into points values (2,4)");
     List<Point> actual = Point.findByX(db, 1);

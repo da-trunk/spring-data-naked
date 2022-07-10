@@ -27,7 +27,7 @@ client:
 spring:
   config:
     import:
-    - classpath:mysql.yml
+#    - classpath:mysql.yml
 #    - classpath:application-server.yml
 #    - optional:classpath:application.yml
   datasource:
@@ -37,7 +37,8 @@ spring:
       port: 1521
     username: test
     password: test
-    url: jdbc:oracle:thin:@localhost:1521/XEPDB1  
+    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+    driver-class-name: oracle.jdbc.driver.OracleDriver    
   data:
     rest:
       base-path: api

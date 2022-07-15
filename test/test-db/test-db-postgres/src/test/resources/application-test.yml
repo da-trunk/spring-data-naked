@@ -1,0 +1,14 @@
+debug: false
+spring:
+  config:
+    import:
+    - classpath:postgres.yml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    container:
+      #port: 5432
+logging:
+  level:
+    root: warn
+    org.datrunk.naked: trace
+    com.mysql.cj.jdbc: trace

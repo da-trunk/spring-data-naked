@@ -196,7 +196,7 @@ public interface SpringTestDbContainer extends SpringTestContainer {
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
             | InvocationTargetException e) {
           log.catching(e);
-          throw new IllegalArgumentException("Cannot construct an instance of" + clazz.getName());
+          throw new IllegalArgumentException("Cannot construct an instance of" + clazz.getName(), e);
         }
         if (env.getProperty("spring.datasource.url") == null) {
           instance.start();

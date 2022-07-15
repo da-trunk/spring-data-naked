@@ -32,7 +32,7 @@ public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer> imple
     super(environment.getProperty("spring.datasource.container.image"));
     init(this, environment, this::addFixedExposedPort);
     withCopyFileToContainer(MountableFile.forHostPath(environment.getProperty("spring.datasource.container.config")), "/etc/mysql/conf.d/myconf.cnf");
-    waitingFor(new LogMessageWaitStrategy().withRegEx("ready for connections"));
+//    waitingFor(new LogMessageWaitStrategy().withRegEx("ready for connections"));
   }
 
 //  public MySqlTestContainer(@Nonnull String imageName, @Nonnull String cnfPath, @Nonnull String userName, @Nonnull String password,

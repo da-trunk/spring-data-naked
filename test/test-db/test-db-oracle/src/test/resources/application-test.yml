@@ -8,6 +8,8 @@ spring:
     password: test
     url: jdbc:oracle:thin:@localhost:1521/XEPDB1
     driver-class-name: oracle.jdbc.driver.OracleDriver
+  liquibase:
+    enabled: true
 logging:
   level:
     root: warn

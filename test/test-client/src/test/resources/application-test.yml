@@ -30,15 +30,11 @@ spring:
 #    - classpath:mysql.yml
 #    - classpath:application-server.yml
 #    - optional:classpath:application.yml
+    - classpath:mysql.yml
   datasource:
+    #url: jdbc:mysql://localhost:3306/test
     container:
-      image: oracle-xe:21.3.0
-      type: xe21
-      port: 1521
-    username: test
-    password: test
-    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
-    driver-class-name: oracle.jdbc.driver.OracleDriver    
+      #port: 3306
   data:
     rest:
       base-path: api

@@ -17,36 +17,37 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>test-entities</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>server</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<type>test-jar</type>
+			<artifactId>test-db-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>test-common</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.glytching</groupId>
+			<artifactId>junit-extensions</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.gavlyukovskiy</groupId>
-			<artifactId>p6spy-spring-boot-starter</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Used for javax.annotation.Nonnull -->
@@ -62,19 +63,24 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
 		</dependency>
 
+		<!--<dependency>
+			<groupId>com.github.gavlyukovskiy</groupId>
+			<artifactId>p6spy-spring-boot-starter</artifactId>
+		</dependency>-->
+
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${testcontainers.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.github.glytching</groupId>
-			<artifactId>junit-extensions</artifactId>
-			<scope>test</scope>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
 		</dependency>
+
 	</dependencies>
 	<build>
 		<pluginManagement>
@@ -87,17 +93,19 @@
 						<propertyFile>liquibase.properties</propertyFile>
 						<propertyFileWillOverride>false</propertyFileWillOverride>
 						<changeLogDirectory>src/main/resources/liquibase</changeLogDirectory>
-						<changeLogFile>schema-create.xml</changeLogFile>
+						<changeLogFile>${liquibase.changeLogFile}</changeLogFile>
 						<outputChangeLogFile>schema-create-new.xml</outputChangeLogFile>
-						<diffChangeLogFile>src/main/resource/${maven.build-timestamp}_changelog.xml</diffChangeLogFile>
+						<diffChangeLogFile>target/liquibase/schema_${maven.build.timestamp}.xml</diffChangeLogFile>
 						<diffIncludeObjects>table:[a-z].*</diffIncludeObjects>
 						<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
 						<verbose>true</verbose>
 						<contexts></contexts>
-						<referenceUrl>hibernate:spring:org.datrunk.naked.test.entities?dialect=org.hibernate.dialect.MySQL8Dialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhyiscalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
 						<referenceDriver>liquibase.ext.hibernate.database.connection.HibernateDriver</referenceDriver>
-						<url>${spring.datasource.url}</url>
+						<referenceUrl>hibernate:spring:org.datrunk.naked.entities?dialect=org.hibernate.dialect.PostgreSQLDialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
+						<referenceUsername>sa</referenceUsername>
+						<referencePassword></referencePassword>
 						<driver>${spring.datasource.driverClassName}</driver>
+						<url>${spring.datasource.url}</url>
 						<username>${spring.datasource.username}</username>
 						<password>${spring.datasource.password}</password>
 					</configuration>
@@ -106,6 +114,11 @@
 							<groupId>postgresql</groupId>
 							<artifactId>postgresql</artifactId>
 							<version>9.1-901-1.jdbc4</version>
+						</dependency>
+						<dependency>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>test-entities</artifactId>
+							<version>${project.version}</version>
 						</dependency>
 						<dependency>
 							<groupId>org.liquibase.ext</groupId>
@@ -138,34 +151,6 @@
 							<artifactId>validation-api</artifactId>
 							<version>${validation-api.version}</version>
 						</dependency>
-						<!--	
-						<dependency>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-core</artifactId>
-							<version>${spring.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-beans</artifactId>
-							<version>${spring.version}</version>
-						</dependency>
-						
-
-						<dependency>
-							<groupId>com.fasterxml.jackson.core</groupId>
-							<artifactId>jackson-annotations</artifactId>
-							<version>${jackson.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.apache.commons</groupId>
-							<artifactId>commons-lang3</artifactId>
-							<version>${commons-lang3.version}</version>
-						</dependency>-->
-						<!--<dependency>
-							<groupId>com.google.guava</groupId>
-							<artifactId>guava</artifactId>
-							<version>${guava.version}</version>
-						</dependency>-->
 					</dependencies>
 				</plugin>
 				<plugin>

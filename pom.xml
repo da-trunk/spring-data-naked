@@ -14,5 +14,7 @@
 		<module>server</module>
 		<module>client</module>
 		<module>test</module>
+		<module>bowman-client</module>
+		<module>bowman-parent</module>
 	</modules>
 </project>

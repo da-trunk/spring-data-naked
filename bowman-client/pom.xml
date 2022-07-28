@@ -21,6 +21,7 @@
 		<groupId>me.hdpe.bowman</groupId>
 		<artifactId>bowman-parent</artifactId>
 		<version>0.9.1-SNAPSHOT</version>
+        <relativePath>../bowman-parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>bowman-client</artifactId>

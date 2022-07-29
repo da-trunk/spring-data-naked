@@ -10,7 +10,7 @@
 	<properties>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
-		<liquibase.changeLogFile>schema-create.xml</liquibase.changeLogFile>
+		<liquibase.changeLogFile>migration_${maven.build.timestamp}.xml</liquibase.changeLogFile>
 	</properties>
 	<dependencyManagement>
 		<dependencies></dependencies>
@@ -98,7 +98,7 @@
 						<changeLogDirectory>src/main/resources/liquibase</changeLogDirectory>
 						<changeLogFile>${liquibase.changeLogFile}</changeLogFile>
 						<outputChangeLogFile>schema-create-new.xml</outputChangeLogFile>
-						<diffChangeLogFile>target/liquibase/schema_${maven.build.timestamp}.xml</diffChangeLogFile>
+						<diffChangeLogFile>${basedir}/src/main/resources/liquibase/migration_${maven.build.timestamp}.xml</diffChangeLogFile>
 						<diffIncludeObjects>table:[a-z].*</diffIncludeObjects>
 						<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
 						<verbose>true</verbose>

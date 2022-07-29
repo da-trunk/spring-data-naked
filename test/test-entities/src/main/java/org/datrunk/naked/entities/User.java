@@ -31,58 +31,41 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RemoteResource("/users")
 @Getter
 @Setter
-@RemoteResource("/users")
-//@Table(schema = "PUBLIC")
 @Inheritance(strategy = InheritanceType.JOINED)
 @ToString
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public class User extends IdClass<Long> {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends IdClass<Integer> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(insertable = false, updatable = false)
-  private Long id;
-
-//  public String getId() {
-//    return String.format("%s %s", firstName, lastName);
-//  }
-//  
-//  public void setId(String id) {
-//    String[] names = id.split(" ");
-//    firstName = names[0];
-//    lastName = names[1];
-//  }
+  private Integer id;
 
   @Nonnull
   private String firstName;
 
-  @Nonnull
   private String lastName;
+//
+//  @NonNull
+//  @Enumerated(EnumType.STRING)
+//  private Role role;
 
-  @NonNull
-  @Enumerated(EnumType.STRING)
-  private Role role;
-
-//    @Column //(columnDefinition = "TIMESTAMP WITH TIME ZONE")
-//    private Instant createTime = Instant.now();
-  @NonNull
-  @Column // (columnDefinition = "TIMESTAMP")
-  @DateTimeFormat(iso = ISO.DATE_TIME)
-  // @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
-  private LocalDateTime createTime = LocalDateTime.now();
-//    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
-//    private OffsetDateTime offsetDateTime;
-
-  public void setCreateTime(String str) {
-    if (str == null || str.isEmpty() || str.toLowerCase().equals("null"))
-      createTime = LocalDateTime.now();
-    else
-      createTime = LocalDateTime.parse(str);
-  }
-
-  public void setCreateTime(LocalDateTime dt) {
-    this.createTime = dt;
-  }
+//  @NonNull
+//  @Column
+//  @DateTimeFormat(iso = ISO.DATE_TIME)
+//  private LocalDateTime createTime = LocalDateTime.now();
+//
+//  public void setCreateTime(String str) {
+//    if (str == null || str.isEmpty() || str.toLowerCase().equals("null"))
+//      createTime = LocalDateTime.now();
+//    else
+//      createTime = LocalDateTime.parse(str);
+//  }
+//
+//  public void setCreateTime(LocalDateTime dt) {
+//    this.createTime = dt;
+//  }
 }

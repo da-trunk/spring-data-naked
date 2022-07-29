@@ -86,12 +86,12 @@ public class BatchUpdateTest {
   @Autowired
   RepoClient.Factory repoClientFactory;
 
-  RepoClient<User, Long> client;
+  RepoClient<User, Integer> client;
   UserRandomizer randomizer;
 
   @BeforeAll
   void beforeAll() {
-    client = repoClientFactory.create(User.class, Long.class);
+    client = repoClientFactory.create(User.class, Integer.class);
     assertThat(client).isNotNull();
     randomizer = new UserRandomizer(100);
   }

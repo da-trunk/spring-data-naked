@@ -38,7 +38,7 @@ import liquibase.exception.LiquibaseException;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = { MySqlTestContainer.Factory.class, TomcatTestContainer.Factory.class }, classes = {
     ClientTest.Config.class, RepoClient.Factory.class })
-@EnableConfigurationProperties({ DataSourceProperties.class, RepoClient.Properties.class})
+@EnableConfigurationProperties({ DataSourceProperties.class, RepoClient.Properties.class })
 @ActiveProfiles("test")
 // @TestMethodOrder(OrderAnnotation.class)
 // @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
@@ -48,7 +48,7 @@ public class ClientTest {
     boolean initialized = false;
 
     @Bean
-    public DataSource dataSource(MySqlTestContainer db) throws LiquibaseException, SQLException {
+    DataSource dataSource(MySqlTestContainer db) throws LiquibaseException, SQLException {
       if (!initialized) {
 //        db.updateAsSys("liquibase/mysql/init.xml");
 //        db.update("liquibase/mysql/schema-update-versioned.xml");
@@ -57,19 +57,19 @@ public class ClientTest {
       }
       return db.getDataSource();
     }
-    
+
     @Bean
-    public CEClient.Factory getClientFactory(ClientProperties properties) {
-        return new CEClient.Factory(properties);
+    CEClient.Factory getClientFactory(ClientProperties properties) {
+      return new CEClient.Factory(properties);
     }
-    
+
     @Bean
-    public RestTemplate getRestTemplate(TomcatTestContainer server, RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate restTemplate = restTemplateBuilder.rootUri(server.getBaseUri().toASCIIString())
-            .setConnectTimeout(Duration.ofSeconds(2))
-            .setReadTimeout(Duration.ofSeconds(2))
-            .build();
-        return restTemplate;
+    RestTemplate getRestTemplate(TomcatTestContainer server, RestTemplateBuilder restTemplateBuilder) {
+      RestTemplate restTemplate = restTemplateBuilder.rootUri(server.getBaseUri().toASCIIString())
+          .setConnectTimeout(Duration.ofSeconds(2))
+          .setReadTimeout(Duration.ofSeconds(2))
+          .build();
+      return restTemplate;
     }
   }
 
@@ -91,6 +91,6 @@ public class ClientTest {
 
   @Test
   public void testCreate() {
-    repoClientFactory.create(User.class, Long.class);
+    repoClientFactory.create(User.class, Integer.class);
   }
 }

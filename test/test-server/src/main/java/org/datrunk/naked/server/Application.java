@@ -7,7 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datrunk.naked.entities.User;
 import org.datrunk.naked.entities.config.CollectionDTOConverter;
-import org.datrunk.naked.server.config.ApplicationContextProvider;
 import org.datrunk.naked.server.config.JerseyConfig;
 import org.datrunk.naked.server.config.TomcatConnectionProperties;
 import org.datrunk.naked.server.entities.AppDetails;
@@ -63,7 +62,7 @@ public class Application extends SpringBootServletInitializer {
   @EnableAutoConfiguration
   public static class Config {
     @Bean
-    public RepositoryRestConfigurer repositoryRestConfigurer(EntityManager entityManager) {
+    RepositoryRestConfigurer repositoryRestConfigurer(EntityManager entityManager) {
       return RepositoryRestConfigurer.withConfig(config -> {
         config.exposeIdsFor(
             entityManager.getMetamodel().getEntities().stream().map(javax.persistence.metamodel.Type::getJavaType).toArray(Class[]::new));
@@ -71,7 +70,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    public com.fasterxml.jackson.databind.Module javaTimeModule() {
+    com.fasterxml.jackson.databind.Module javaTimeModule() {
       JavaTimeModule module = new JavaTimeModule();
       return module;
     }
@@ -89,7 +88,7 @@ public class Application extends SpringBootServletInitializer {
 //        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 //        return objectMapper;
 //    }
-    
+
 //    @Bean
 //    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
 //      return new Jackson2ObjectMapperBuilder().modules(new JavaTimeModule()).serializationInclusion(Include.NON_NULL);
@@ -105,7 +104,7 @@ public class Application extends SpringBootServletInitializer {
     // see
     // https://tech.asimio.net/2020/04/06/Adding-HAL-Hypermedia-to-Spring-Boot-2-applications-using-Spring-HATEOAS.html
     @Bean
-    public FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+    FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
       FilterRegistrationBean<ForwardedHeaderFilter> result = new FilterRegistrationBean<>();
       result.setFilter(new ForwardedHeaderFilter());
       result.setOrder(0);
@@ -140,7 +139,7 @@ public class Application extends SpringBootServletInitializer {
   }
 
   @Bean
-  public FilterRegistrationBean<ForwardedHeaderFilter> loggingFilter() {
+  FilterRegistrationBean<ForwardedHeaderFilter> loggingFilter() {
     FilterRegistrationBean<ForwardedHeaderFilter> registrationBean = new FilterRegistrationBean<>();
     registrationBean.setFilter(new ForwardedHeaderFilter());
     return registrationBean;
@@ -148,7 +147,7 @@ public class Application extends SpringBootServletInitializer {
 
   @Primary
   @Bean(destroyMethod = "close")
-  public DataSource primaryDataSource(DataSourceProperties properties, TomcatConnectionProperties tomcatProperties) {
+  DataSource primaryDataSource(DataSourceProperties properties, TomcatConnectionProperties tomcatProperties) {
     log.info("Connecting to [{}] at [{}]", properties.getUsername(), properties.getUrl());
 
     @SuppressWarnings("cast")
@@ -201,13 +200,13 @@ public class Application extends SpringBootServletInitializer {
    */
 
   @Bean
-  public ResourceConfig jerseyConfig() {
+  ResourceConfig jerseyConfig() {
     return new JerseyConfig();
   }
 
   // @see {@link ApplicationContextProvider}
-  @Bean
-  public static ApplicationContextProvider contextProvider() {
-    return new ApplicationContextProvider();
-  }
+//  @Bean
+//  public static ApplicationContextProvider contextProvider() {
+//    return new ApplicationContextProvider();
+//  }
 }

@@ -15,8 +15,11 @@
  */
 package uk.co.blackpepper.bowman;
 
-import java.io.IOException;
+import static java.util.Arrays.asList;
 
+import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -24,16 +27,20 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.support.HttpRequestWrapper;
 
-import static java.util.Arrays.asList;
-
 class JsonClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+  private static Logger LOGGER = LogManager.getLogger();
 
-	@Override
-	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
-			throws IOException {
-		HttpRequestWrapper wrapped = new HttpRequestWrapper(request);
-		wrapped.getHeaders().put("Content-Type", asList(MediaTypes.HAL_JSON_VALUE));
-		wrapped.getHeaders().put("Accept", asList(MediaTypes.HAL_JSON_VALUE));
-		return execution.execute(wrapped, body);
-	}
+  @Override
+  public ClientHttpResponse intercept(
+      HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+    HttpRequestWrapper wrapped = new HttpRequestWrapper(request);
+    LOGGER.debug(
+        "{} {}: {}",
+        wrapped.getMethodValue(),
+        wrapped.getURI().toString(),
+        wrapped.getRequest().toString());
+    wrapped.getHeaders().put("Content-Type", asList(MediaTypes.HAL_JSON_VALUE));
+    wrapped.getHeaders().put("Accept", asList(MediaTypes.HAL_JSON_VALUE));
+    return execution.execute(wrapped, body);
+  }
 }

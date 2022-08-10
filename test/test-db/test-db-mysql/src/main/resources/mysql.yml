@@ -5,14 +5,13 @@ spring:
       config: '@project.build.directory@/classes/mysql.cnf'
       #port: 3306
     #url: jdbc:mysql://localhost:3306/test
-    username: test
-    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
+    #hikari:
+      #auto-commit: false
   jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: create
-    show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
     properties.hibernate:
       jdbc.time_zone: UTC
+      #connection.provider_disables_autocommit: true
+
+      

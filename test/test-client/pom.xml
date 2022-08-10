@@ -25,6 +25,7 @@
 			<artifactId>test-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>test-db-mysql</artifactId>

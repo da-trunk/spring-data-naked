@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.annotation.Nonnull;
+import liquibase.exception.LiquibaseException;
 import lombok.extern.log4j.Log4j2;
 import org.datrunk.naked.db.SpringTestDbContainer;
 import org.springframework.core.env.Environment;
@@ -20,6 +21,7 @@ import org.testcontainers.utility.MountableFile;
 public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer>
     implements SpringTestDbContainer {
   private String jdbcUrl;
+  private String liquibaseInitializationScript = null;
 
   public MySqlTestContainer(final @Nonnull Environment environment) {
     super(
@@ -29,6 +31,8 @@ public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer>
     withCopyFileToContainer(
         MountableFile.forHostPath(environment.getProperty("spring.datasource.container.config")),
         "/etc/mysql/conf.d/myconf.cnf");
+    liquibaseInitializationScript =
+        environment.getProperty("spring.datasource.container.liquibase.changeLog");
   }
 
   @Override
@@ -49,6 +53,14 @@ public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer>
   public void start() {
     super.start();
     log.info("{} started at {}", getClass().getSimpleName(), getJdbcUrl());
+    try {
+      if (liquibaseInitializationScript != null) {
+        log.trace("executing {}", liquibaseInitializationScript);
+        updateAsSys(liquibaseInitializationScript);
+      }
+    } catch (LiquibaseException | SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

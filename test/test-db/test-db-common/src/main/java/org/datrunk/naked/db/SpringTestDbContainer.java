@@ -23,9 +23,6 @@ import org.datrunk.naked.db.jdbc.ThrowingConsumer;
 import org.datrunk.naked.test.container.SpringTestContainer;
 import org.datrunk.naked.test.container.SpringTestContainers;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.context.properties.bind.BindResult;
-import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -191,6 +188,7 @@ public interface SpringTestDbContainer extends SpringTestContainer {
   public static class Factory
       implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     private static SpringTestDbContainer instance = null;
+    private static boolean shouldStop = true;
     private final Class<? extends SpringTestDbContainer> clazz;
 
     public Factory(Class<? extends SpringTestDbContainer> clazz) {
@@ -205,15 +203,16 @@ public interface SpringTestDbContainer extends SpringTestContainer {
 
     private void create(ConfigurableApplicationContext ctx) {
       final ConfigurableEnvironment env = ctx.getEnvironment();
-      BindResult<DataSourceProperties> binder =
-          Binder.get(env).bind("spring.datasource", DataSourceProperties.class);
-      DataSourceProperties props = binder.get();
+      //      BindResult<DataSourceProperties> binder =
+      //          Binder.get(env).bind("spring.datasource", DataSourceProperties.class);
+      //      DataSourceProperties props = binder.get();
       if (instance == null) {
         final Logger log = LogManager.getLogger();
         try {
           Constructor<? extends SpringTestDbContainer> constructor =
               clazz.getConstructor(Environment.class);
           instance = constructor.newInstance(env);
+          shouldStop = env.getProperty("spring.datasource.container.port") == null;
         } catch (NoSuchMethodException
             | SecurityException
             | InstantiationException
@@ -235,7 +234,9 @@ public interface SpringTestDbContainer extends SpringTestContainer {
         ctx.addApplicationListener(
             applicationEvent -> {
               if (applicationEvent instanceof ContextClosedEvent) {
-                instance.stop();
+                if (shouldStop) {
+                  instance.stop();
+                }
               }
             });
       }

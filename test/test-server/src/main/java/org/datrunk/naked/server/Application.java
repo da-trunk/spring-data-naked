@@ -9,7 +9,6 @@ import org.datrunk.naked.entities.User;
 import org.datrunk.naked.server.config.ApplicationContextProvider;
 import org.datrunk.naked.server.config.JerseyConfig;
 import org.datrunk.naked.server.config.TomcatConnectionProperties;
-import org.datrunk.naked.server.entities.AppDetails;
 import org.datrunk.naked.server.repo.BaseRepositoryImpl;
 import org.datrunk.naked.server.repo.UserRepo;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -59,7 +58,7 @@ public class Application extends SpringBootServletInitializer {
   @EnableHypermediaSupport(type = HypermediaType.HAL)
   @EnableAspectJAutoProxy
   @EnableTransactionManagement
-  @EnableConfigurationProperties({AppDetails.class, TomcatConnectionProperties.class})
+  @EnableConfigurationProperties(TomcatConnectionProperties.class)
   @EnableAutoConfiguration
   public static class Config {
     @Bean
@@ -156,7 +155,6 @@ public class Application extends SpringBootServletInitializer {
       DataSourceProperties properties, TomcatConnectionProperties tomcatProperties) {
     log.info("Connecting to [{}] at [{}]", properties.getUsername(), properties.getUrl());
 
-    @SuppressWarnings("cast")
     org.apache.tomcat.jdbc.pool.DataSource dataSource =
         properties
             .initializeDataSourceBuilder()

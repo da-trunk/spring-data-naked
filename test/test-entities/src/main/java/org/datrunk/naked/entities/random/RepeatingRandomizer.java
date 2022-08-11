@@ -72,7 +72,7 @@ public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
 
   public List<T> getAll() throws Exception {
     while (populatedBeans.size() < maxSize) {
-      populatedBeans.add(get());
+      populatedBeans.add(getRandomValue());
     }
     return ImmutableList.copyOf(populatedBeans);
   }

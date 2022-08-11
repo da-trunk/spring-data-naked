@@ -15,62 +15,72 @@
  */
 package uk.co.blackpepper.bowman;
 
+import static java.util.Arrays.asList;
+
+import java.net.URI;
 import java.util.Arrays;
-
-import org.springframework.hateoas.EntityModel;
-
+import java.util.Optional;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
-
-import static java.util.Arrays.asList;
+import org.datrunk.naked.entities.WithUri;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.Link;
 
 public class JavassistClientProxyFactory implements ClientProxyFactory {
 
-	@Override
-	public <T> T create(EntityModel<T> resource, RestOperations restOperations) {
-		@SuppressWarnings("unchecked")
-		Class<T> entityType = (Class<T>) resource.getContent().getClass();
-		
-		MethodHandlerChain handlerChain = new MethodHandlerChain(asList(
-			new ResourceIdMethodHandler(resource),
-			new LinkedResourceMethodHandler(resource, restOperations, this),
-			new SimplePropertyMethodHandler<>(resource)
-		));
-		
-		return createProxyInstance(entityType, handlerChain);
-	}
-	
-	private static <T> T createProxyInstance(Class<T> entityType, MethodHandlerChain handlerChain) {
-		ProxyFactory factory = new ProxyFactory();
-		if (ProxyFactory.isProxyClass(entityType)) {
-			factory.setInterfaces(getNonProxyInterfaces(entityType));
-			factory.setSuperclass(entityType.getSuperclass());
-		}
-		else {
-			factory.setSuperclass(entityType);
-		}
-		factory.setFilter(handlerChain);
-		
-		Class<?> clazz = factory.createClass();
-		T proxy = instantiateClass(clazz);
-		((Proxy) proxy).setHandler(handlerChain);
-		return proxy;
-	}
-	
-	private static Class[] getNonProxyInterfaces(Class<?> entityType) {
-		return Arrays.stream(entityType.getInterfaces())
-			.filter(i -> !Proxy.class.isAssignableFrom(i))
-			.toArray(Class[]::new);
-	}
-	
-	private static <T> T instantiateClass(Class<?> clazz) {
-		try {
-			@SuppressWarnings("unchecked")
-			T proxy = (T) clazz.newInstance();
-			return proxy;
-		}
-		catch (Exception exception) {
-			throw new ClientProxyException("couldn't create proxy instance of " + clazz, exception);
-		}
-	}
+  @Override
+  public <T> T create(EntityModel<T> resource, RestOperations restOperations) {
+    final T entity = resource.getContent();
+    @SuppressWarnings("unchecked")
+    Class<T> entityType = (Class<T>) entity.getClass();
+
+    MethodHandlerChain handlerChain =
+        new MethodHandlerChain(
+            asList(
+                new ResourceIdMethodHandler(resource),
+                new LinkedResourceMethodHandler(resource, restOperations, this),
+                new SimplePropertyMethodHandler<>(resource)));
+
+    T proxy = createProxyInstance(entityType, handlerChain);
+    //  Links links = resource.getLinks();
+    Optional<Link> selfLink = resource.getLink(IanaLinkRelations.SELF);
+    URI selfUri = selfLink.map(link -> URI.create(link.getHref())).orElse(null);
+    if (entity instanceof WithUri) {
+      WithUri resourceWithUri = (WithUri) entity;
+      proxy.setUri(selfUri);
+    }
+  }
+
+  private static <T> T createProxyInstance(Class<T> entityType, MethodHandlerChain handlerChain) {
+    ProxyFactory factory = new ProxyFactory();
+    if (ProxyFactory.isProxyClass(entityType)) {
+      factory.setInterfaces(getNonProxyInterfaces(entityType));
+      factory.setSuperclass(entityType.getSuperclass());
+    } else {
+      factory.setSuperclass(entityType);
+    }
+    factory.setFilter(handlerChain);
+
+    Class<?> clazz = factory.createClass();
+    T proxy = instantiateClass(clazz);
+    ((Proxy) proxy).setHandler(handlerChain);
+    return proxy;
+  }
+
+  private static Class[] getNonProxyInterfaces(Class<?> entityType) {
+    return Arrays.stream(entityType.getInterfaces())
+        .filter(i -> !Proxy.class.isAssignableFrom(i))
+        .toArray(Class[]::new);
+  }
+
+  private static <T> T instantiateClass(Class<?> clazz) {
+    try {
+      @SuppressWarnings("unchecked")
+      T proxy = (T) clazz.newInstance();
+      return proxy;
+    } catch (Exception exception) {
+      throw new ClientProxyException("couldn't create proxy instance of " + clazz, exception);
+    }
+  }
 }

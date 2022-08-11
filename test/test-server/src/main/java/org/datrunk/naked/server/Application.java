@@ -155,7 +155,6 @@ public class Application extends SpringBootServletInitializer {
       DataSourceProperties properties, TomcatConnectionProperties tomcatProperties) {
     log.info("Connecting to [{}] at [{}]", properties.getUsername(), properties.getUrl());
 
-    @SuppressWarnings("cast")
     org.apache.tomcat.jdbc.pool.DataSource dataSource =
         properties
             .initializeDataSourceBuilder()

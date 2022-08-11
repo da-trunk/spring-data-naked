@@ -1,6 +1,15 @@
 package uk.co.blackpepper.bowman;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.AdditionalMatchers.aryEq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
+import java.net.URI;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,14 +18,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.AdditionalMatchers.aryEq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class JsonClientHttpRequestInterceptorTest {
 	
@@ -31,6 +32,7 @@ public class JsonClientHttpRequestInterceptorTest {
 	public void interceptSetsContentTypeAndAcceptHeaders() throws IOException {
 		HttpRequest request = mock(HttpRequest.class);
 		when(request.getHeaders()).thenReturn(new HttpHeaders());
+		when(request.getURI()).thenReturn(URI.create(""));
 		
 		ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
 		

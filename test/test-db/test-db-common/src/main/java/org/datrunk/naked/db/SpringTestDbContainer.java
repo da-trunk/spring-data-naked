@@ -7,15 +7,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
@@ -38,6 +33,14 @@ import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
+
+import liquibase.Contexts;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 
 /**
  * Adds methods to {@link SpringTestContainer} that are useful for RDBMS
@@ -189,6 +192,7 @@ public interface SpringTestDbContainer extends SpringTestContainer {
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public static class Factory implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     private static SpringTestDbContainer instance = null;
+    private static boolean shouldStop = true;
     private final Class<? extends SpringTestDbContainer> clazz;
 
     public Factory(Class<? extends SpringTestDbContainer> clazz) {
@@ -210,7 +214,12 @@ public interface SpringTestDbContainer extends SpringTestContainer {
         try {
           Constructor<? extends SpringTestDbContainer> constructor = clazz.getConstructor(Environment.class);
           instance = constructor.newInstance(env);
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
+          shouldStop = env.getProperty("spring.datasource.container.port") == null;
+        } catch (NoSuchMethodException
+            | SecurityException
+            | InstantiationException
+            | IllegalAccessException
+            | IllegalArgumentException
             | InvocationTargetException e) {
           log.catching(e);
           throw new IllegalArgumentException("Cannot construct an instance of" + clazz.getName(), e);
@@ -223,11 +232,14 @@ public interface SpringTestDbContainer extends SpringTestContainer {
           log.info("{} connecting to {}", clazz.getSimpleName(), instance.getJdbcUrl());
         }
 
-        ctx.addApplicationListener(applicationEvent -> {
-          if (applicationEvent instanceof ContextClosedEvent) {
-            instance.stop();
-          }
-        });
+        ctx.addApplicationListener(
+            applicationEvent -> {
+              if (applicationEvent instanceof ContextClosedEvent) {
+                if (shouldStop) {
+                  instance.stop();
+                }
+              }
+            });
       }
 
       // Programmatically register the container as a bean so it can be injected

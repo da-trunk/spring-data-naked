@@ -108,6 +108,7 @@ public class CEClient<T extends WithUri & WithId<?>> extends Client<T> {
         UriComponentsBuilder.fromUri(getBaseUri()).pathSegment("search", "findAll").build().toUri();
     log.trace("GET {}", uri);
     Iterable<T> entities = getAll(uri);
+    // TODO: call setUrl on all referenced types
     return entities;
   }
 

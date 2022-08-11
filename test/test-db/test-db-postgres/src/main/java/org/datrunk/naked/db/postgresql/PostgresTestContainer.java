@@ -3,14 +3,12 @@ package org.datrunk.naked.db.postgresql;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.Duration;
 
 import javax.annotation.Nonnull;
 
 import org.datrunk.naked.db.SpringTestDbContainer;
 import org.springframework.core.env.Environment;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -23,6 +21,7 @@ import lombok.extern.log4j.Log4j2;
 public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestContainer> implements SpringTestDbContainer {
   private String jdbcUrl;
 
+  @SuppressWarnings("resource")
   public PostgresTestContainer(final @Nonnull Environment environment) {
     super(environment.getProperty("spring.datasource.container.image"));
     init(this, environment, this::addFixedExposedPort);

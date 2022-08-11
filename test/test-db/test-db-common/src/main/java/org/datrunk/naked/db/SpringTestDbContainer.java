@@ -7,28 +7,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.datrunk.naked.db.jdbc.DataSourceWrapper;
-import org.datrunk.naked.db.jdbc.ThrowingConsumer;
-import org.datrunk.naked.test.container.SpringTestContainer;
-import org.datrunk.naked.test.container.SpringTestContainers;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
-import org.springframework.test.context.support.TestPropertySourceUtils;
-import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.images.PullPolicy;
-import org.testcontainers.utility.DockerImageName;
-
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -36,6 +16,28 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.datrunk.naked.db.jdbc.DataSourceWrapper;
+import org.datrunk.naked.db.jdbc.ThrowingConsumer;
+import org.datrunk.naked.test.container.SpringTestContainer;
+import org.datrunk.naked.test.container.SpringTestContainers;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.support.TestPropertySourceUtils;
+import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.images.PullPolicy;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * Adds methods to {@link SpringTestContainer} that are useful for RDBMS
@@ -99,52 +101,63 @@ public interface SpringTestDbContainer extends SpringTestContainer {
     }
   }
 
-  default void execute(LiquibaseCommand command, String changeLogFile, String user, String password)
-      throws SQLException, LiquibaseException {
-    Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(getConnection(user, password)));
-    try (Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database)) {
-      command.accept(liquibase);
+  default void execute(LiquibaseCommand command, String changeLogFile, String user, String password) throws Exception {
+    try (Connection conn = getConnection(user, password)) {
+      Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(conn));
+      try (ClassLoaderResourceAccessor clra = new ClassLoaderResourceAccessor();
+          Liquibase liquibase = new Liquibase(changeLogFile, clra, database)) {
+        command.accept(liquibase);
+      }
     }
   }
 
-  default void updateAsSys(String changeLog) throws LiquibaseException, SQLException {
-    update(changeLog, getSysConnection());
+  default void updateAsSys(String changeLog) throws Exception {
+    try (Connection conn = getSysConnection()) {
+      final Contexts contexts = new Contexts();
+      execute(liquibase -> liquibase.update(contexts), changeLog, conn);
+    }
   }
 
-  default void update(String changeLog) throws LiquibaseException, SQLException {
-    update(changeLog, getConnection());
+  default void update(String changeLog) throws Exception {
+    final Contexts contexts = new Contexts();
+    update(changeLog, contexts);
   }
 
-  default void update(String changeLog, String user, String password) throws LiquibaseException, SQLException {
-    update(changeLog, getConnection(user, password));
+  default void update(String changeLog, Contexts contexts) throws Exception {
+    try (Connection conn = getConnection(getUsername(), getPassword())) {
+      execute(liquibase -> liquibase.update(contexts), changeLog, conn);
+    }
   }
 
-  default void update(String changeLog, Connection connection) throws LiquibaseException, SQLException {
-    final Contexts contexts = new Contexts("xe", "production");
-    execute(liquibase -> liquibase.update(contexts), changeLog, connection);
+  default void tag(String changeLog) throws Exception {
+    execute(liquibase -> liquibase.tag("0"), changeLog, getUsername(), getPassword());
   }
-
-  default void execute(LiquibaseCommand command, String changeLogFile, Connection connection) throws SQLException, LiquibaseException {
+  
+  default void execute(LiquibaseCommand command, String changeLogFile, Connection connection) throws Exception {
     Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-    try (Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database)) {
+    try (ClassLoaderResourceAccessor clra = new ClassLoaderResourceAccessor();
+        Liquibase liquibase = new Liquibase(changeLogFile, clra, database)) {
       command.accept(liquibase);
     } finally {
     }
   }
 
-  default void rollback(String rollBackToTag) throws LiquibaseException, SQLException {
-    rollback(rollBackToTag, getConnection());
+  default void rollback(String rollBackToTag) throws Exception {
+    try (Connection conn = getConnection(getUsername(), getPassword())) {
+      rollback(rollBackToTag, conn);
+    }
   }
 
-  default void rollback(String rollBackToTag, Connection connection) throws LiquibaseException, SQLException {
+  default void rollback(String rollBackToTag, Connection connection) throws Exception {
     final Contexts contexts = new Contexts("xe", "production");
     execute(liquibase -> liquibase.rollback(rollBackToTag, contexts), "schema-update-versioned.xml", connection);
   }
 
-  default void rollback() throws LiquibaseException, SQLException {
+  default void rollback() throws Exception {
     rollback("0");
   }
 
+  @SuppressWarnings("resource")
   default void init(@Nonnull JdbcDatabaseContainer<?> result, final @Nonnull Environment environment,
       @Nonnull BiConsumer<Integer, Integer> addFixedExposedPort) {
     DockerImageName.parse(result.getDockerImageName()).assertValid();
@@ -152,6 +165,7 @@ public interface SpringTestDbContainer extends SpringTestContainer {
     result.withNetworkAliases("db");
     result.withAccessToHost(true);
     assert (!result.getExposedPorts().isEmpty());
+    result.withDatabaseName(environment.getProperty("spring.datasource.database"));
     result.withUsername(environment.getProperty("spring.datasource.username"));
     result.withPassword(environment.getProperty("spring.datasource.password"));
     if (result.getDockerImageName().endsWith(":latest")) {
@@ -160,7 +174,8 @@ public interface SpringTestDbContainer extends SpringTestContainer {
     if (environment.getProperty("spring.datasource.container.port") == null) {
       result.withReuse(false);
     } else {
-      addFixedExposedPort.accept(Integer.valueOf(environment.getProperty("spring.datasource.container.port")), result.getExposedPorts().get(0));
+      addFixedExposedPort.accept(Integer.valueOf(environment.getProperty("spring.datasource.container.port")),
+          result.getExposedPorts().get(0));
       result.withReuse(true);
     }
   }
@@ -187,7 +202,9 @@ public interface SpringTestDbContainer extends SpringTestContainer {
     }
 
     private void create(ConfigurableApplicationContext ctx) {
-      final Environment env = ctx.getEnvironment();
+      final ConfigurableEnvironment env = ctx.getEnvironment();
+      BindResult<DataSourceProperties> binder = Binder.get(env).bind("spring.datasource", DataSourceProperties.class);
+      DataSourceProperties props = binder.get();
       if (instance == null) {
         final Logger log = LogManager.getLogger();
         try {
@@ -198,13 +215,19 @@ public interface SpringTestDbContainer extends SpringTestContainer {
           log.catching(e);
           throw new IllegalArgumentException("Cannot construct an instance of" + clazz.getName(), e);
         }
-        if (env.getProperty("spring.datasource.url") == null) {
+        if (props.getUrl() == null) {
           instance.start();
-          System.setProperty("spring.datasource.url", instance.getJdbcUrl());
+          props.setUrl(instance.getJdbcUrl());
         } else {
-          instance.setJdbcUrl(env.getProperty("spring.datasource.url"));
+          instance.setJdbcUrl(props.getUrl());
           log.info("{} connecting to {}", clazz.getSimpleName(), instance.getJdbcUrl());
         }
+
+        ctx.addApplicationListener(applicationEvent -> {
+          if (applicationEvent instanceof ContextClosedEvent) {
+            instance.stop();
+          }
+        });
       }
 
       // Programmatically register the container as a bean so it can be injected

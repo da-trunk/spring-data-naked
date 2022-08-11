@@ -53,7 +53,7 @@ class OracleIntegrationTest {
     boolean initialized = false;
 
     @Bean
-    DataSource dataSource(OracleTestContainer db) throws LiquibaseException, SQLException {
+    DataSource dataSource(OracleTestContainer db) throws Exception {
       if (!initialized) {
         initialized = true;
         db.update("changelog-master.xml");

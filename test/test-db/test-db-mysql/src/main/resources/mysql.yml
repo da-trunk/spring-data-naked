@@ -7,6 +7,7 @@ spring:
     #url: jdbc:mysql://localhost:3306/test
     username: test
     password: password
+    database: test
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     generate-ddl: true

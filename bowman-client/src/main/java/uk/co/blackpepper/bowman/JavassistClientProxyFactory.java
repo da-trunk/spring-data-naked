@@ -47,9 +47,9 @@ public class JavassistClientProxyFactory implements ClientProxyFactory {
     Optional<Link> selfLink = resource.getLink(IanaLinkRelations.SELF);
     URI selfUri = selfLink.map(link -> URI.create(link.getHref())).orElse(null);
     if (entity instanceof WithUri) {
-      WithUri resourceWithUri = (WithUri) entity;
-      proxy.setUri(selfUri);
+      ((WithUri) entity).setUri(selfUri);;
     }
+    return proxy;
   }
 
   private static <T> T createProxyInstance(Class<T> entityType, MethodHandlerChain handlerChain) {

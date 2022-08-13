@@ -93,14 +93,14 @@ public class CEClient<T extends WithUri & WithId<?>> extends Client<T> {
         entityType, batchUri, getConfiguration(), getRestOperations(), getProxyFactory());
   }
 
-  @Override
-  public T get(URI uri) {
-    T result = super.get(uri);
-    if (result != null) {
-      result.setUri(uri);
-    }
-    return result;
-  }
+//  @Override
+//  public T get(URI uri) {
+//    T result = super.get(uri);
+//    if (result != null) {
+//      result.setUri(uri);
+//    }
+//    return result;
+//  }
 
   // http://localhost:9080/api/remoteResource/search/findAll
   public Iterable<T> findAll() {

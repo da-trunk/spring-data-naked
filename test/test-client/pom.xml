@@ -126,7 +126,7 @@
 									<artifactId>test-server</artifactId>
 									<version>0.1-SNAPSHOT</version>
 									<type>war</type>
-									<overWrite>true</overWrite>
+									<overWrite>false</overWrite>
 								</artifactItem>
 							</artifactItems>
 							<includes>**/conf/**</includes>
@@ -146,7 +146,7 @@
 									<artifactId>test-db-mysql</artifactId>
 									<version>0.1-SNAPSHOT</version>
 									<type>jar</type>
-									<overWrite>true</overWrite>
+									<overWrite>false</overWrite>
 								</artifactItem>
 							</artifactItems>
 							<includes>**/mysql.cnf</includes>

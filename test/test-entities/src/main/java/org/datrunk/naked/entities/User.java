@@ -48,10 +48,10 @@ public class User extends IdClass<Integer> {
   private String firstName;
 
   private String lastName;
-//
-//  @NonNull
-//  @Enumerated(EnumType.STRING)
-//  private Role role;
+
+  @NonNull
+  @Enumerated(EnumType.STRING)
+  private Role role;
 
 //  @NonNull
 //  @Column

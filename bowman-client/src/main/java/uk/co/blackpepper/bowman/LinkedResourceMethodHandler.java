@@ -10,9 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.datrunk.naked.entities.WithUri;
 import org.datrunk.naked.entities.bowman.annotation.LinkedResource;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 
 class LinkedResourceMethodHandler extends AbstractPropertyAwareMethodHandler {
 
@@ -103,7 +105,7 @@ class LinkedResourceMethodHandler extends AbstractPropertyAwareMethodHandler {
 
 		if (result == null) {
 			Object resultValue = resolveLinkedResource(self, method, proceed, args);
-
+			
 			result = new LinkedResourceResult(resultValue);
 
 			linkedResourceResults.put(method.getName(), result);

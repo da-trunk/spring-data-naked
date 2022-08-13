@@ -11,7 +11,7 @@ test:
    #     url: jdbc:mysql://localhost:3306/test
     tomcat:
       image: tomcat:9-jdk8-adoptopenjdk-hotspot
-      port: 9080
+      #port: 9080
       #url:  http://localhost:9080
       config:
         war-path: '@project.build.directory@/ROOT.war'

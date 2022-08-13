@@ -16,6 +16,6 @@ public class UserRandomizer extends RepeatingRandomizer<User> {
   @Override
   protected User get() throws Randomizer.Exception {
     final Name name = faker.name();
-    return new User(name.firstName());//, name.lastName(), roleRandomizer.getRandomValue());
+    return new User(name.firstName(), roleRandomizer.getRandomValue());
   }
 }

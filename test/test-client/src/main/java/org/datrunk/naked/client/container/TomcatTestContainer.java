@@ -154,11 +154,14 @@ public class TomcatTestContainer extends GenericContainer<TomcatTestContainer>
           log.info("TomcatTestContainer connecting to {}", instance.getBaseUri());
         }
       }
+      assert(instance != null);
 
       // Programmatically register the container as a bean so it can be injected
       ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
       if (!beanFactory.containsBean(TomcatTestContainer.class.getName())) {
         beanFactory.registerSingleton(TomcatTestContainer.class.getName(), instance);
+        assert(instance.getBaseUri() != null);
+        assert(instance.getBaseUri().toASCIIString() != null);
         TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
             ctx, "client.repo.location=" + instance.getBaseUri().toASCIIString());
       }

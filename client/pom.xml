@@ -17,7 +17,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>me.hdpe.bowman</groupId>
+            <groupId>org.datrunk.naked</groupId>
             <artifactId>bowman-client</artifactId>
         </dependency>
         <dependency>

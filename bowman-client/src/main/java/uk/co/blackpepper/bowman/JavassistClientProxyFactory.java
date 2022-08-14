@@ -17,15 +17,18 @@ package uk.co.blackpepper.bowman;
 
 import static java.util.Arrays.asList;
 
+import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Optional;
-import javassist.util.proxy.Proxy;
-import javassist.util.proxy.ProxyFactory;
+
 import org.datrunk.naked.entities.WithUri;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
+
+import javassist.util.proxy.Proxy;
+import javassist.util.proxy.ProxyFactory;
 
 public class JavassistClientProxyFactory implements ClientProxyFactory {
 
@@ -47,7 +50,7 @@ public class JavassistClientProxyFactory implements ClientProxyFactory {
     Optional<Link> selfLink = resource.getLink(IanaLinkRelations.SELF);
     URI selfUri = selfLink.map(link -> URI.create(link.getHref())).orElse(null);
     if (entity instanceof WithUri) {
-      ((WithUri) entity).setUri(selfUri);;
+      ((WithUri) entity).setUri(selfUri);
     }
     return proxy;
   }
@@ -68,7 +71,7 @@ public class JavassistClientProxyFactory implements ClientProxyFactory {
     return proxy;
   }
 
-  private static Class[] getNonProxyInterfaces(Class<?> entityType) {
+  private static Class<?>[] getNonProxyInterfaces(Class<?> entityType) {
     return Arrays.stream(entityType.getInterfaces())
         .filter(i -> !Proxy.class.isAssignableFrom(i))
         .toArray(Class[]::new);
@@ -76,8 +79,9 @@ public class JavassistClientProxyFactory implements ClientProxyFactory {
 
   private static <T> T instantiateClass(Class<?> clazz) {
     try {
+      Constructor<?> constructor = clazz.getConstructor();
       @SuppressWarnings("unchecked")
-      T proxy = (T) clazz.newInstance();
+      T proxy = (T) constructor.newInstance();
       return proxy;
     } catch (Exception exception) {
       throw new ClientProxyException("couldn't create proxy instance of " + clazz, exception);

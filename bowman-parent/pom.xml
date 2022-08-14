@@ -21,9 +21,10 @@
 		<groupId>uk.co.blackpepper</groupId>
 		<artifactId>bp-parent</artifactId>
 		<version>1.5.0</version>
+		<relativePath/>
 	</parent>
 	
-	<groupId>me.hdpe.bowman</groupId>
+	<groupId>org.datrunk.naked</groupId>
 	<artifactId>bowman-parent</artifactId>
 	<version>0.9.1-SNAPSHOT</version>
 	<packaging>pom</packaging>

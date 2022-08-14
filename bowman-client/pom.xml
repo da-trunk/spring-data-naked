@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>me.hdpe.bowman</groupId>
+		<groupId>org.datrunk.naked</groupId>
 		<artifactId>bowman-parent</artifactId>
 		<version>0.9.1-SNAPSHOT</version>
 		<relativePath>../bowman-parent/pom.xml</relativePath>

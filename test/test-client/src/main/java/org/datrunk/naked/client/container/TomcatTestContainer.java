@@ -111,9 +111,9 @@ public class TomcatTestContainer extends GenericContainer<TomcatTestContainer> i
    * @return MountableFile
    */
   MountableFile forHostPath(Path path, String... strComponents) {
-    if (path.startsWith("\\mnt\\c")) {
+    if (path.startsWith("\\mnt\\")) {
       File file = new java.io.File(path.subpath(2, path.getNameCount()).toAbsolutePath().toString());
-      log.warn("Converting windows path [{}] to [{}]", path, file.getAbsolutePath());
+      log.warn("Converting Windows path [{}] to [{}]", path, file.getAbsolutePath());
       path = file.toPath();
     }
     assertThat(path).exists();

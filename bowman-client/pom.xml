@@ -12,13 +12,19 @@
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
+	
+	Modified in 2022 to make this project compatible with 
+	projects at io.github.da-trunk.naked.  Modifications include changing the groupId and
+	relocating the contents of this file to bowman-client/pom.xml.  
+	The original groupId was me.hdpe.bowman.  This modified file is still licensed
+	under Apache License, Version 2.0, but with copyright 2022 by io.github.da-trunk.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.datrunk.naked</groupId>
+		<groupId>io.github.da-trunk.naked</groupId>
 		<artifactId>bowman-parent</artifactId>
 		<version>0.9.1-SNAPSHOT</version>
 		<relativePath>../bowman-parent/pom.xml</relativePath>
@@ -95,8 +101,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.datrunk.naked</groupId>
-			<artifactId>entities</artifactId>
+			<groupId>io.github.da-trunk.naked</groupId>
+			<artifactId>sdn-entities</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>

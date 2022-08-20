@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.datrunk.naked</groupId>
+	<groupId>io.github.da-trunk.naked</groupId>
 	<artifactId>sdn-parent</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -30,19 +30,24 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.datrunk.naked</groupId>
+				<groupId>io.github.da-trunk.naked</groupId>
 				<artifactId>bowman-client</artifactId>
 				<version>0.9.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>server</artifactId>
+				<artifactId>sdn-server</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>entities</artifactId>
+				<artifactId>sdn-client</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>sdn-entities</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -360,11 +365,11 @@
 			<name>Central Repository OSSRH</name>
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
-		<repository>
+		<!--<repository>
 			<id>github</id>
 			<name>GitHub Packages</name>
 			<url>https://maven.pkg.github.com/da-trunk/spring-data-naked/</url>
-		</repository>
+		</repository>-->
 	</distributionManagement>
 	<profiles>
 		<profile>

@@ -12,6 +12,10 @@
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
+		
+	Modified in 2022 by io.github.da-trunk to make this project compatible with 
+	projects at io.github.da-trunk.naked.  Modifications include changing the groupId.  
+	The original groupId was me.hdpe.bowman.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
@@ -21,10 +25,10 @@
 		<groupId>uk.co.blackpepper</groupId>
 		<artifactId>bp-parent</artifactId>
 		<version>1.5.0</version>
-		<relativePath/>
+		<relativePath />
 	</parent>
-	
-	<groupId>org.datrunk.naked</groupId>
+
+	<groupId>io.github.da-trunk.naked</groupId>
 	<artifactId>bowman-parent</artifactId>
 	<version>0.9.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -34,32 +38,32 @@
 	</description>
 
 	<url>https://github.com/BlackPepperSoftware/bowman</url>
-	
+
 	<inceptionYear>2016</inceptionYear>
-	
+
 	<licenses>
-	    <license>
-	        <name>The Apache Software License, Version 2.0</name>
-	        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-	        <distribution>repo</distribution>
-	    </license>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
 	</licenses>
 
 	<scm>
-	    <connection>scm:git:git@github.com:BlackPepperSoftware/bowman.git</connection>
-	    <developerConnection>scm:git:git@github.com:BlackPepperSoftware/bowman.git</developerConnection>
-	    <tag>HEAD</tag>
-	    <url>https://github.com/BlackPepperSoftware/bowman</url>
+		<connection>scm:git:git@github.com:BlackPepperSoftware/bowman.git</connection>
+		<developerConnection>scm:git:git@github.com:BlackPepperSoftware/bowman.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/BlackPepperSoftware/bowman</url>
 	</scm>
-	
+
 	<issueManagement>
-	    <system>GitHub</system>
-	    <url>https://github.com/BlackPepperSoftware/bowman/issues</url>
+		<system>GitHub</system>
+		<url>https://github.com/BlackPepperSoftware/bowman/issues</url>
 	</issueManagement>
-	
+
 	<ciManagement>
-	    <system>Travis CI</system>
-	    <url>https://travis-ci.org/BlackPepperSoftware/bowman</url>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/BlackPepperSoftware/bowman</url>
 	</ciManagement>
 
 	<properties>
@@ -79,7 +83,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -93,7 +97,7 @@
 					<artifactId>coveralls-maven-plugin</artifactId>
 					<version>4.3.0</version>
 				</plugin>
-				
+
 				<plugin>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>3.0.0</version>
@@ -112,13 +116,13 @@
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>0.8.7</version>
 				</plugin>
-				
+
 				<plugin>
 					<groupId>org.asciidoctor</groupId>
 					<artifactId>asciidoctor-maven-plugin</artifactId>
 					<version>1.5.6</version>
 				</plugin>
-				
+
 				<plugin>
 					<artifactId>maven-site-plugin</artifactId>
 					<configuration>
@@ -143,7 +147,7 @@
 				<artifactId>bowman-client</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-		
+
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
@@ -151,19 +155,19 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.javassist</groupId>
 				<artifactId>javassist</artifactId>
 				<version>3.25.0-GA</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>2.9.0</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>

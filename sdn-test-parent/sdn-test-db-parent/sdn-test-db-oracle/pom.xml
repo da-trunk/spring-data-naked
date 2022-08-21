@@ -2,12 +2,11 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>sdn-parent</artifactId>
+        <artifactId>sdn-test-db-parent</artifactId>
         <groupId>io.github.da-trunk.naked</groupId>
         <version>0.1-SNAPSHOT</version>
-        <relativePath>../../../sdn-parent/pom.xml</relativePath>
     </parent>
-    <artifactId>test-db-oracle</artifactId>
+    <artifactId>sdn-test-db-oracle</artifactId>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -25,11 +24,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>test-entities</artifactId>
+            <artifactId>sdn-test-entities</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>test-db-common</artifactId>
+            <artifactId>sdn-test-db-common</artifactId>
         </dependency>
 
         <dependency>

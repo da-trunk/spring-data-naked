@@ -7,7 +7,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>test-client</artifactId>
+	<artifactId>sdn-test-client</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -16,18 +16,18 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>test-entities</artifactId>
+			<artifactId>sdn-test-entities</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>test-common</artifactId>
+			<artifactId>sdn-test-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>test-db-mysql</artifactId>
+			<artifactId>sdn-test-db-mysql</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -57,7 +57,7 @@
     </dependency>
     <dependency>
       <groupId>io.github.da-trunk.naked</groupId>
-      <artifactId>test-server</artifactId>
+      <artifactId>sdn-test-server</artifactId>
       <version>0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>-->
@@ -103,7 +103,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>io.github.da-trunk.naked</groupId>
-									<artifactId>test-server</artifactId>
+									<artifactId>sdn-test-server</artifactId>
 									<version>0.1-SNAPSHOT</version>
 									<type>war</type>
 									<outputDirectory>${project.build.directory}</outputDirectory>
@@ -122,7 +122,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>io.github.da-trunk.naked</groupId>
-									<artifactId>test-server</artifactId>
+									<artifactId>sdn-test-server</artifactId>
 									<version>0.1-SNAPSHOT</version>
 									<type>war</type>
 									<overWrite>false</overWrite>
@@ -142,7 +142,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>io.github.da-trunk.naked</groupId>
-									<artifactId>test-db-mysql</artifactId>
+									<artifactId>sdn-test-db-mysql</artifactId>
 									<version>0.1-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>

@@ -52,17 +52,17 @@
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>test-entities</artifactId>
+				<artifactId>sdn-test-entities</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>test-db-common</artifactId>
+				<artifactId>sdn-test-db-common</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>test-common</artifactId>
+				<artifactId>sdn-test-common</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

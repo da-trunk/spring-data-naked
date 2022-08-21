@@ -2,11 +2,10 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.da-trunk.naked</groupId>
-    <artifactId>sdn-parent</artifactId>
+    <artifactId>sdn-test-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <relativePath>../../sdn-parent/pom.xml</relativePath>
   </parent>
-  <artifactId>test-common</artifactId>
+  <artifactId>sdn-test-common</artifactId>
   <properties>
     <spring-boot.version>2.6.6</spring-boot.version>
   </properties>

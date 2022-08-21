@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-		<artifactId>sdn-parent</artifactId>
+		<artifactId>sdn-test-parent</artifactId>
 		<groupId>io.github.da-trunk.naked</groupId>
 		<version>0.1-SNAPSHOT</version>
-		<relativePath>../../sdn-parent/pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>test-server</artifactId>
+	<artifactId>sdn-test-server</artifactId>
 	<packaging>war</packaging>
 	<properties>
 		<start-class>io.github.da-trunk.naked.server.config.Application</start-class>
@@ -20,11 +19,11 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>test-entities</artifactId>
+			<artifactId>sdn-test-entities</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>test-db-mysql</artifactId>
+			<artifactId>sdn-test-db-mysql</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

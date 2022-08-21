@@ -14,7 +14,7 @@
 		<module>bowman-client</module>
 		<module>bowman-parent</module>
 		<module>sdn-client</module>
-		<module>sdn-test</module>
+		<module>sdn-test-parent</module>
 	</modules>
 	<name>Spring Data Naked Objects</name>
 	<description>A simple naked objects implementation based on spring-data-rest</description>
@@ -62,17 +62,17 @@
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>test-entities</artifactId>
+				<artifactId>sdn-test-entities</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>test-db-common</artifactId>
+				<artifactId>sdn-test-db-common</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>test-common</artifactId>
+				<artifactId>sdn-test-common</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

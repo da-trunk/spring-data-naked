@@ -2,11 +2,11 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>test-db-parent</artifactId>
+		<artifactId>sdn-test-db-parent</artifactId>
 		<groupId>io.github.da-trunk.naked</groupId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>test-db-h2</artifactId>
+	<artifactId>sdn-test-db-h2</artifactId>
 	<properties>
 		<start-class>io.github.da-trunk.naked.db.Application</start-class>
 		<spring-boot.version>2.6.4</spring-boot.version>
@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>test-entities</artifactId>
+			<artifactId>sdn-test-entities</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

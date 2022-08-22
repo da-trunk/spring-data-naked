@@ -38,7 +38,7 @@ import com.google.common.collect.ImmutableSet;
  * also null, then it is ignored and all other fields are included (via
  * reflection).
  * 
- * @author ansonator
+ * @author da-trunk@outlook.com
  *
  * @param <ID>
  */

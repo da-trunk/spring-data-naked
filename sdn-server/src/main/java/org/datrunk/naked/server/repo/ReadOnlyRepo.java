@@ -13,7 +13,7 @@ import org.springframework.data.repository.query.QueryByExampleExecutor;
 /**
  * A subset of JPARepository which is read only.
  * 
- * @author ansonator
+ * @author da-trunk@outlook.com
  *
  * @param <T>
  * @param <ID>

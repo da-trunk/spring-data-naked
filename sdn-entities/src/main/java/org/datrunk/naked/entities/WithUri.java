@@ -5,7 +5,7 @@ import java.net.URI;
 /**
  * Entities supported from by {@link CEClient} should implement this interface.
  * 
- * @author ansonator
+ * @author da-trunk@outlook.com
  *
  */
 public interface WithUri {

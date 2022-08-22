@@ -7,7 +7,7 @@ package org.datrunk.naked.entities;
  * An entity implementing this should include a field {@code private ID id;} and class annotation
  * {@code @EqualsAndHashCode(of = { "id" })}.
  * 
- * @author ansonator
+ * @author da-trunk@outlook.com
  *
  * @param <ID>
  */

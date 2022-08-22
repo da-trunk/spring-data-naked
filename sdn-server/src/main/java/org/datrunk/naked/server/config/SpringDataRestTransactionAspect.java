@@ -42,7 +42,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * Inspired by <a href=
  * "https://stackoverflow.com/questions/25717127/handle-spring-data-rest-application-events-within-the-transaction">handle-spring-data-rest-application-events-within-the-transaction</a>
  * 
- * @author ansonator
+ * @author da-trunk@outlook.com
  * @deprecated This uses Spring AOP, so it is limited to point cuts on Spring beans. In addition, advice will only be applied when the
  *             method is called from another class. Due to this, I was unable to find a good point cut. {@link Servlet#service} works as a
  *             point cut and it opens the transaction early enough to ensure the entire request runs under a single transaction. However, it

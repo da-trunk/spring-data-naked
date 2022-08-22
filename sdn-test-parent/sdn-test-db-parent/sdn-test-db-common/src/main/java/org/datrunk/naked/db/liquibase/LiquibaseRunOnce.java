@@ -14,7 +14,7 @@ import liquibase.integration.spring.SpringLiquibase;
  * 
  * If you want to run liquibase before every test class, comment this out.
  *
- * @author ansonator
+ * @author da-trunk@outlook.com
  *
  */
 @Component

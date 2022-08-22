@@ -9,7 +9,7 @@
 // * @Configuration for tests which want to import the full set of beans we use in
 // *                production.
 // * 
-// * @author ansonator
+// * @author da-trunk@outlook.com
 // *
 // */
 //public class TestApplication extends Application {

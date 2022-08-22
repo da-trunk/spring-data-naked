@@ -12,7 +12,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 /**
  * Enhances {@link JpaRepository} with methods which operate directly on the {@link EntityManager}.
  *
- * @author ansonator
+ * @author da-trunk@outlook.com
  * @param <T>
  * @param <ID>
  */
@@ -41,7 +41,7 @@ public interface BaseRepository<T extends WithId<ID>, ID extends Serializable>
   /**
    * Recreates the entity from the data store.
    *
-   * @param entity to query // * @return entity matching the current DB state
+   * @param entity to query, it is modified to match the current DB state
    */
   void refresh(T entity);
 
@@ -54,9 +54,6 @@ public interface BaseRepository<T extends WithId<ID>, ID extends Serializable>
    * the entity or its references are modified in the DB via triggers before they are persisted.
    * Simply saving the entity is insufficient because Hibernate's first level cache will avoid
    * re-querying the DB again.
-   *
-   * <p>Prefer this when saving instances of {@link CodeSystem} and {@link ProprietaryCode}.
-   * Otherwise, they will appear to have an empty set of versions.
    *
    * @param entity
    * @return The entity's proxy after persisting it and recreating it from the DB.
@@ -71,8 +68,6 @@ public interface BaseRepository<T extends WithId<ID>, ID extends Serializable>
    * @param entity
    */
   void refreshAndDelete(T entity);
-
-  // void saveAll(Wrapper<T> entities);
 
   void flushAndClear();
 

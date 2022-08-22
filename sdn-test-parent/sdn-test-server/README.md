@@ -52,3 +52,16 @@
   * `curl -i -X PATCH -H "Content-Type: application/json-patch+json" -d '[ {"op":"add","path":"/users/-","value":"Bob"} ]' http://localhost:9080/api/users/1`
   * `curl -i -X DELETE http://localhost:9080/api/users/1`
   
+# Running tests manually
+
+  * Start a database.  See [sdn-test-db-parent](../sdn-test-db-parent/README.md)) for code to start an empty database.
+  * Edit `application-default.yml` to point to the existing database and service.
+  * Start the server: `mvn spring-boot:run` (from the root directory of this repository)
+  * Run tests
+  
+# Migrating the database
+
+  * Start a database and server container.
+  * Generate change sets from the entities created by test-server: `mvn liquibase:diff`
+  * Deploy change sets to another database: `mvn liquibase:update`
+      

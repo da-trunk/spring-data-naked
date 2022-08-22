@@ -61,3 +61,4 @@ sqlplus test/test@//localhost/XEPDB1
         `mvn liquibase:update -P docker -D "liquibase.changeLogFile=master.xml" -D "liquibase.contexts=xe,dev"`
       1. Tag the schema: 
         `mvn liquibase:tag -P docker -D "liquibase.tag=0" -pl test-database`
+       

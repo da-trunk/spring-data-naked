@@ -1,28 +1,17 @@
-# ER Diagram
-
-<object data="erDiagram.pdf" type="application/pdf" width="100%">
-    <embed src="docs/erDiagram.pdf">
-        <p>This browser does not support PDFs.</p>
-    </embed>
-</object>
-
 # Generating Liquibase Changesets
 
 ## Generating Schema in Docker
 
-  * Start an empty docker DB
-    1. Login: `docker login ? -u <your id>`
-    1. Pull image: `docker pull <image>`
-    1. Start container: `docker run --shm-size=1g --name test-db-oracle -p 1521:1521 -e ORACLE_SID=oracle -e ORACLE_PDB=oracle -e ORACLE_PWD=password <image>`
+  * Start a docker container for your chosen RDBMS implementation.  
+  	* See [sdn-test-db-parent](../sdn-test/sdn-test-db-parent/README.md) for assistance.
   * Generate change sets from the entities: `mvn liquibase:diff`
   * Deploy change sets to the empty db: `mvn liquibase:update`
-  * Connect SQL Developer to `localhost`, port `1521`, service name `XE`.
 
 # Entity Architecture
 
 ## Limitations and workarounds
 
-While creating this, I've run into limitations which have influenced my architecture. I started noting them here. This same document includes my design goals. This section only documents the technical goals and design decisions.
+While creating this, I've run into limitations which have influenced the architecture. I started noting them here. This same document includes my design goals. This section only documents the technical goals and design decisions.
 
   * Requirements of an entity which is exposed as a resource in the client and server:
     * The following class-level annotations are required:

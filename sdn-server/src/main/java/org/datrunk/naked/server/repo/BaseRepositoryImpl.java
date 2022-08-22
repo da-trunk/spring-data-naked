@@ -29,8 +29,7 @@ public class BaseRepositoryImpl<T extends WithId<ID>, ID extends Serializable>
    * = null) or doesn't exist in the DB. Call this after updating tables which could fire triggers
    * within the DB.
    *
-   * @param entity to query. The entity's identifier must be initialized.
-   * @returns newly built entity after requerying the DB.
+   * @param entity to query re-populate. The entity's identifier must be initialized.
    */
   @Override
   public void refresh(T entity) {

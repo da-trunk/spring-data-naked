@@ -166,6 +166,12 @@
 				<version>${spring-boot.version}</version>
 			</dependency>
 			<dependency>
+				<!-- to make javadoc stop complaining about @Transactional in jakarta.transaction-api -->
+				<groupId>javax.interceptor</groupId>
+				<artifactId>javax.interceptor-api</artifactId>
+				<version>1.2.2</version>
+			</dependency>
+			<dependency>
 				<groupId>org.javassist</groupId>
 				<artifactId>javassist</artifactId>
 				<version>${javassist.version}</version>
@@ -372,6 +378,18 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<!--<plugin>
+				<groupId>com.spotify.fmt</groupId>
+				<artifactId>fmt-maven-plugin</artifactId>
+				<version>2.19</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

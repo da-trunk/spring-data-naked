@@ -298,6 +298,7 @@
 						</execution>
 					</executions>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
@@ -345,8 +346,27 @@
 					</executions>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>3.0.1</version>
+					<executions>
+						<execution>
+							<id>sign-artifacts</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>sign</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.22.2</version>
+					<configuration>
+						<reuseForks>true</reuseForks>
+						<argLine>@{argLine} -Xmx2048m</argLine>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -390,6 +410,7 @@
 					</execution>
 				</executions>
 			</plugin>-->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -416,24 +437,76 @@
 			</plugin>
 		</plugins>
 	</build>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>maven-snapshot</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>maven-central</id>
-			<name>Central Repository OSSRH</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-		<!--<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/da-trunk/spring-data-naked/</url>
-		</repository>-->
-	</distributionManagement>
 	<profiles>
+		<profile>
+			<id>github-repository</id>
+			<activation>
+				<property>
+					<name>!centralRepo</name>
+				</property>
+			</activation>
+			<properties></properties>
+			<distributionManagement>
+				<snapshotRepository>
+					<id>github-snapshot</id>
+					<name>GitHub Packages</name>
+					<url>https://maven.pkg.github.com/da-trunk/spring-data-naked/</url>
+				</snapshotRepository>
+				<repository>
+					<id>github</id>
+					<name>GitHub Packages</name>
+					<url>https://maven.pkg.github.com/da-trunk/spring-data-naked/</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>central-repository</id>
+			<activation>
+				<property>
+					<name>centralRepo</name>
+				</property>
+			</activation>
+			<properties></properties>
+			<distributionManagement>
+				<snapshotRepository>
+					<id>maven-snapshot</id>
+					<name>Sonatype Nexus Snapshots</name>
+					<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+				</snapshotRepository>
+				<repository>
+					<id>maven-central</id>
+					<name>Central Repository OSSRH</name>
+					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.8</version>
+						<executions>
+							<!-- Prepares the property pointing to the JaCoCo runtime agent which is passed as VM argument when Maven the Surefire plugin is executed. -->
+							<execution>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<!-- Ensures that the code coverage report is created after all tests have been run. -->
+							<execution>
+								<id>generate-report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>lombok</id>
 			<build>

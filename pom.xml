@@ -363,10 +363,9 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.22.2</version>
-					<!--<configuration>
+					<configuration>
 						<reuseForks>true</reuseForks>
-						<argLine>@{argLine} -Xmx2048m</argLine>
-					</configuration>-->
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -484,6 +483,12 @@
 			<id>coverage</id>
 			<build>
 				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<argLine>@{argLine} -Xmx2048m</argLine>
+						</configuration>
+					</plugin>
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>

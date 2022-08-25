@@ -48,7 +48,7 @@ jobs:
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
 
-    - name: Publish SNAPSHOT to GitHub Packages from ${{ GITHUB_WORKSPACE }}/settings.xml
+    - name: Publish SNAPSHOT to GitHub Packages from settings.xml
       run: mvn --batch-mode deploy -DskipTests
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

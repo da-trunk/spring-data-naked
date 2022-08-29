@@ -24,8 +24,8 @@
     1. Start db container.
     1. Connect db container to network: `docker network connect mynetwork <container> --alias db`
     1. Start API: `docker run -it --name tomcat --network mynetwork <image>`
-    1. `docker build -t mapping-api .`
-    1. `docker run --name tomcat -p 9080:8080 mapping-api:latest -d`
+    1. `docker build -t test-api .`
+    1. `docker run --name tomcat -p 9080:8080 test-api:latest -d`
   * Without a container:
     1. `mvn spring-boot:run`
   * Troubleshooting:

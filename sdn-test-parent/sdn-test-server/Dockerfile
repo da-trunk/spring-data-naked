@@ -5,7 +5,7 @@ COPY target/test-classes/conf/Catalina/localhost conf/Catalina/localhost
 COPY target/test-classes/conf/* conf/
 RUN for file in `ls conf/Catalina/localhost/*`; do sed -i 's/\r$//' $file; done
 RUN sed -i 's/\r$//' conf/server.xml
-ADD http://repo.release.cerner.corp/nexus/service/local/repositories/external-repo/content/com/oracle/ojdbc6_g/11.2.0.4/ojdbc6_g-11.2.0.4.jar lib/odbc6.jar
+ADD https://oss.sonatype.org/service/local/repositories/releases/content/com/oracle/database/jdbc/ojdbc6/11.2.0.4/ojdbc6-11.2.0.4.jar lib/odbc6.jar
 RUN mv webapps.dist/manager webapps
 RUN apt-get update && apt-get install vim -y
 EXPOSE 8080

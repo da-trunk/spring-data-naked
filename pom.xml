@@ -14,8 +14,9 @@
 		<module>sdn-client</module>
 		<module>sdn-test-parent</module>
 	</modules>
-	<name>Spring Data Naked Objects</name>
+	<name>${project.groupId}:${project.artifactId}</name>
 	<description>A simple naked objects implementation based on spring-data-rest</description>
+	<url>https://github.com/da-trunk/spring-data-naked</url>
 	<properties>
 		<spring-boot.version>2.7.0</spring-boot.version>
 		<liquibase.version>4.12.0</liquibase.version>

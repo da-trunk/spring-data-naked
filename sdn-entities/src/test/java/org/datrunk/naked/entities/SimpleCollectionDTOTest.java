@@ -48,7 +48,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 @SpringBootTest(classes = SimpleCollectionDTOTest.Config.class, webEnvironment = WebEnvironment.NONE,
-    properties = { "logging.level.com.cerner.concept.mapping.support.jpa.repo=debug" })
+    properties = { "logging.level.org.datrunk.naked=debug" })
 @ExtendWith({ SpringExtension.class })
 @Log4j2
 public class SimpleCollectionDTOTest {

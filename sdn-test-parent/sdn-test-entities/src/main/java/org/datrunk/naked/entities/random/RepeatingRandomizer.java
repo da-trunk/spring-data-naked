@@ -107,8 +107,7 @@ public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
    *
    * <p>This is to deal with error <i>A different object with the same identifier value was already
    * associated with the session</i>. For more information, see section
-   * <b>DataIntegrityViolationException</b> in the README in module <b>si-mapping-entities</b> for
-   * more information.
+   * <b>DataIntegrityViolationException</b> in the README.
    *
    * <p>Implementation Note: this is a lambda to help decouple subclasses from persistence-related
    * dependencies.

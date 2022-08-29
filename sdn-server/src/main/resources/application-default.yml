@@ -29,7 +29,7 @@ logging:
   level:
     root: warn
     "[org.springframework.transaction.interceptor]": warn
-#    "[com.cerner.concept.mapping]": debug
+#    "[org.datrunk.naked]": debug
 #    "[org.springframework.web]": info
 #    "[org.hibernate]": warn
 #    "[org.springframework.boot.web.embedded.tomcat.TomcatWebServer]": info

@@ -88,7 +88,7 @@ import uk.co.blackpepper.bowman.TypeResolver;
 import uk.co.blackpepper.bowman.annotation.ResourceTypeInfo;
 
 @SpringBootTest(classes = CollectionDTOTest.Config.class, webEnvironment = WebEnvironment.NONE,
-    properties = { "spring.main.lazy-initialization=true", "logging.level.com.cerner.concept.mapping.support.jpa.repo=debug" })
+    properties = { "spring.main.lazy-initialization=true", "logging.level.org.datrunk.naked=debug" })
 @ExtendWith({ SpringExtension.class })
 @Log4j2
 public class CollectionDTOTest {

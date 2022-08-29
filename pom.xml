@@ -10,7 +10,6 @@
 		<module>sdn-entities</module>
 		<module>sdn-server</module>
 		<module>bowman-client</module>
-		<module>bowman-parent</module>
 		<module>sdn-client</module>
 		<module>sdn-test-parent</module>
 	</modules>
@@ -90,6 +89,16 @@
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>25.1-jre</version>
+			</dependency>
+				<dependency>
+				<groupId>org.javassist</groupId>
+				<artifactId>javassist</artifactId>
+				<version>3.25.0-GA</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.9.0</version>
 			</dependency>
 
 			<dependency>
@@ -561,6 +570,10 @@
 		<url>http://github.com/da-trunk/spring-data-naked/tree/master</url>
 		<tag>0.0.1</tag>
 	</scm>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/da-trunk/spring-data-naked/issues</url>
+	</issueManagement>
 	<developers>
 		<developer>
 			<id>da-trunk</id>

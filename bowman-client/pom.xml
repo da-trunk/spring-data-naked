@@ -13,7 +13,7 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 	
-	Modified in 2022 to make this project compatible with 
+	Modified from bowman-client-0.9.1-SNAPSHOT in 2022 to make this project compatible with 
 	projects at io.github.da-trunk.naked.  Modifications include changing the groupId and
 	relocating the contents of this file to bowman-client/pom.xml.  
 	The original groupId was me.hdpe.bowman.  This modified file is still licensed

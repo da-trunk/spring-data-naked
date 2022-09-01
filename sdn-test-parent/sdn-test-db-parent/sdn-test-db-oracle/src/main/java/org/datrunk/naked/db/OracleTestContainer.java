@@ -24,7 +24,6 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import oracle.jdbc.pool.OracleDataSource;
 
 /**
  * Extends {@link OracleContainer} with properties and methods specific to our

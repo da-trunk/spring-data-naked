@@ -15,7 +15,7 @@ public class TestLiquibaseConfiguration {
    *
    * <p>If you want to run liquibase before every test class, comment this out.
    *
-   * @author ba030483
+   * @author Ansonator
    */
   @Component
   @ConditionalOnClass(SpringLiquibase.class)

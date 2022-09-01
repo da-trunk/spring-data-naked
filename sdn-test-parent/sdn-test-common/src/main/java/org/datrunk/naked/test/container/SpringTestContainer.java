@@ -50,7 +50,7 @@ public interface SpringTestContainer extends AutoCloseable {
    * @return the directory on the host where container will write data.
    */
   default String getVolume(String name) {
-    // return "/c/Users/ba030483/AppData/Local/Temp/xe21";
+    // return "/c/Users/Ansonator/AppData/Local/Temp/xe21";
     String tmpDir = System.getProperty("java.io.tmpdir");
     String strPath = toHostPath(Paths.get(tmpDir, name));
     final Logger log = LogManager.getLogger();

@@ -44,7 +44,6 @@ import lombok.extern.log4j.Log4j2;
 @EnableConfigurationProperties(DataSourceProperties.class)
 @ActiveProfiles("test")
 @Log4j2
-@Disabled("connection refused")
 class OracleIntegrationTest {
   @Configuration
   @EnableAutoConfiguration
@@ -56,7 +55,7 @@ class OracleIntegrationTest {
     DataSource dataSource(OracleTestContainer db) throws Exception {
       if (!initialized) {
         initialized = true;
-        db.update("changelog-master.xml");
+//        db.update("changelog-master.xml");
       }
       return db.getDataSource();
     }

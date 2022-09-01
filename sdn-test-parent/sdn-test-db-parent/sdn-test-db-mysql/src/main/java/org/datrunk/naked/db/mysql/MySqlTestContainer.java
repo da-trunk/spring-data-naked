@@ -12,13 +12,12 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
-import liquibase.exception.LiquibaseException;
 import lombok.extern.log4j.Log4j2;
 
 /**
  * Spring integration for {@link MySQLContainer}.
  *
- * @author BA030483
+ * @author Ansonator
  */
 @Log4j2
 public class MySqlTestContainer extends MySQLContainer<MySqlTestContainer>

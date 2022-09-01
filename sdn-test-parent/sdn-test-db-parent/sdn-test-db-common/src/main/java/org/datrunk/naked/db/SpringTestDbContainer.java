@@ -188,7 +188,7 @@ public interface SpringTestDbContainer extends SpringTestContainer {
   void start();
 
   void stop();
-
+  
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public static class Factory implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     private static SpringTestDbContainer instance = null;

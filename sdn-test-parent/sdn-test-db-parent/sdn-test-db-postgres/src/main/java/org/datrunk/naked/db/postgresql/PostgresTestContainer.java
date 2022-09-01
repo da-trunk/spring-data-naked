@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j2;
 /**
  * Spring integration for {@link PostgresTestContainer}.
  *
- * @author BA030483
+ * @author Ansonator
  */
 @Log4j2
 public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestContainer> implements SpringTestDbContainer {

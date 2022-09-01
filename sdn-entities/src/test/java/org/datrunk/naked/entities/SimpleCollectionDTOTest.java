@@ -153,7 +153,7 @@ public class SimpleCollectionDTOTest {
     /**
      * Do not include handler when serializing a proxy object created by javassist.util.proxy to JSON.
      * 
-     * @author BA030483
+     * @author Ansonator
      *
      */
     public static class ProxyModule extends SimpleModule {

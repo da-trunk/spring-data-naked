@@ -35,8 +35,6 @@ sqlplus test/test@//localhost/XEPDB1
     * search: `<changeSet[^>]*>(?s)\s+<drop\w+ ([^>]+?)>\s+<\/changeSet>\s+(?-s)`
     * replace:
     
-
-
 # Building an XE image
 
   1. Install [docker for windows](https://docs.docker.com/docker-for-windows/install/)
@@ -52,13 +50,10 @@ sqlplus test/test@//localhost/XEPDB1
     `docker logs -t -f db`
   1. Test that the DB is now up.  If this connects to a `SQL>` prompt, it is ready and you may proceed.  Exit the prompt by typing `quit`.
     `docker exec -it db sqlplus sys/password@//localhost:1521/XEPDB1 as sysdba`
-  1. Clone this repo and switch to the root directory of it (`cd discern-ontology-database`).  Then, use the following process to create a versioned DB in the new docker container.
+  1. Create the test user.
+  1. Execute the liquibase changesets you built to deploy schema in the new docker container.
       1. Build: 
-        `mvn install -DskipTests -D "liquibase.username=test"`
-      1. (Re)-create the user : 
-        `mvn liquibase:update -P schema-drop-create,docker`
-      1. Deploy schema: 
-        `mvn liquibase:update -P docker -D "liquibase.changeLogFile=master.xml" -D "liquibase.contexts=xe,dev"`
+        `mvn liquibase:update -D "liquibase.changeLogFile=<diffOutput>"`
       1. Tag the schema: 
-        `mvn liquibase:tag -P docker -D "liquibase.tag=0" -pl test-database`
+        `mvn liquibase:tag -D "liquibase.tag=0"`
        

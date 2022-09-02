@@ -58,7 +58,32 @@ jobs:
         
     - uses: actions/delete-package-versions@v3
       with: 
-        package-version-ids: 0.1-SNAPSHOT
-        # package-name: 'test-package'
+        package-name: 'io.github.da-trunk.naked.sdn-parent'
         min-versions-to-keep: 1
-        delete-only-pre-release-versions: "true"        
+        delete-only-pre-release-versions: "true"
+   
+    - uses: actions/delete-package-versions@v3
+      with: 
+        package-name: 'io.github.da-trunk.naked.sdn-server'
+        min-versions-to-keep: 1
+        delete-only-pre-release-versions: "true"
+        
+    - uses: actions/delete-package-versions@v3
+      with: 
+        package-name: 'io.github.da-trunk.naked.sdn-client'
+        min-versions-to-keep: 1
+        delete-only-pre-release-versions: "true"
+        
+    - uses: actions/delete-package-versions@v3
+      with: 
+        package-name: 'io.github.da-trunk.naked.sdn-entities'
+        min-versions-to-keep: 1
+        delete-only-pre-release-versions: "true"
+        
+    - uses: actions/delete-package-versions@v3
+      with: 
+        package-name: 'io.github.da-trunk.naked.sdn-test-db-oracle'
+        min-versions-to-keep: 1
+        delete-only-pre-release-versions: "true"
+                
+        

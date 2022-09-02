@@ -90,7 +90,7 @@
 				<artifactId>guava</artifactId>
 				<version>25.1-jre</version>
 			</dependency>
-				<dependency>
+			<dependency>
 				<groupId>org.javassist</groupId>
 				<artifactId>javassist</artifactId>
 				<version>3.25.0-GA</version>
@@ -359,8 +359,20 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
-			<plugin>
+			<!--<plugin>
 				<groupId>com.spotify.fmt</groupId>
+				<artifactId>fmt-maven-plugin</artifactId>
+				<version>2.19</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>-->
+			<plugin>
+				<groupId>com.coveo</groupId>
 				<artifactId>fmt-maven-plugin</artifactId>
 				<version>2.9</version>
 				<executions>
@@ -371,6 +383,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

@@ -1,19 +1,13 @@
 spring:
+  config:
+    import: 
+    - classpath:oracle.yml
   datasource:
-    container:
-      image: gvenzl/oracle-xe:21.3.0-slim-faststart
-      type: xe21
-      port: 1521
-    username: test
-    password: test
-    database: test
     #url: jdbc:oracle:thin:@localhost:1521/XEPDB1
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-  liquibase:
-    enabled: true
-    change-log: changelog-master.yml
+    container:
+      #port: 1521
 logging:
   level:
     root: warn
     org.datrunk.naked: trace
-    
+    com.mysql.cj.jdbc: trace

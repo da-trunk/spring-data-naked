@@ -1,4 +1,3 @@
-debug: false
 spring:
   config:
     import:  # imports mysql.yml and mysql-<profile>.yml after importing the properties in this file.  This gives precedence to properties defined in mysql-<profile>.yml 

@@ -21,14 +21,12 @@ import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Optional;
-
+import javassist.util.proxy.Proxy;
+import javassist.util.proxy.ProxyFactory;
 import org.datrunk.naked.entities.WithUri;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
-
-import javassist.util.proxy.Proxy;
-import javassist.util.proxy.ProxyFactory;
 
 public class JavassistClientProxyFactory implements ClientProxyFactory {
 

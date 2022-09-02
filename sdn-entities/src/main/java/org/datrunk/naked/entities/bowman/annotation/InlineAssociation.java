@@ -7,10 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to mark a property as an inline association.  In the server, this is ignored.
- * 
+ * Annotation to mark a property as an inline association. In the server, this is ignored.
+ *
  * @author Bryce Anson
- * 
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

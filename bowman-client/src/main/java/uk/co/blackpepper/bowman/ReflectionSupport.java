@@ -18,41 +18,40 @@ package uk.co.blackpepper.bowman;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
-
 import org.datrunk.naked.entities.bowman.annotation.ResourceId;
 import org.springframework.util.ReflectionUtils;
 
 final class ReflectionSupport {
 
-	private static final Class<ResourceId> ID_ACCESSOR_ANNOTATION = ResourceId.class;
-	
-	private ReflectionSupport() {
-	}
-	
-	public static URI getId(Object object) {
-		Method accessor = getIdAccessor(object.getClass());
-		return (URI) ReflectionUtils.invokeMethod(accessor, object);
-	}
+  private static final Class<ResourceId> ID_ACCESSOR_ANNOTATION = ResourceId.class;
 
-	public static void setId(Object value, URI uri) {
-		Field idField = getIdField(value.getClass());
-		idField.setAccessible(true);
-		ReflectionUtils.setField(idField, value, uri);
-	}
-	
-	private static Method getIdAccessor(Class<?> clazz) {
-		for (Method method : ReflectionUtils.getAllDeclaredMethods(clazz)) {
-			if (method.getAnnotation(ID_ACCESSOR_ANNOTATION) != null) {
-				return method;
-			}
-		}
-		
-		throw new IllegalArgumentException(String.format("No @%s found for %s",
-			ID_ACCESSOR_ANNOTATION.getSimpleName(), clazz.getName()));
-	}
+  private ReflectionSupport() {}
 
-	private static Field getIdField(Class<?> clazz) {
-		Method idAccessor = getIdAccessor(clazz);
-		return ReflectionUtils.findField(clazz, HalSupport.toLinkName(idAccessor.getName()));
-	}
+  public static URI getId(Object object) {
+    Method accessor = getIdAccessor(object.getClass());
+    return (URI) ReflectionUtils.invokeMethod(accessor, object);
+  }
+
+  public static void setId(Object value, URI uri) {
+    Field idField = getIdField(value.getClass());
+    idField.setAccessible(true);
+    ReflectionUtils.setField(idField, value, uri);
+  }
+
+  private static Method getIdAccessor(Class<?> clazz) {
+    for (Method method : ReflectionUtils.getAllDeclaredMethods(clazz)) {
+      if (method.getAnnotation(ID_ACCESSOR_ANNOTATION) != null) {
+        return method;
+      }
+    }
+
+    throw new IllegalArgumentException(
+        String.format(
+            "No @%s found for %s", ID_ACCESSOR_ANNOTATION.getSimpleName(), clazz.getName()));
+  }
+
+  private static Field getIdField(Class<?> clazz) {
+    Method idAccessor = getIdAccessor(clazz);
+    return ReflectionUtils.findField(clazz, HalSupport.toLinkName(idAccessor.getName()));
+  }
 }

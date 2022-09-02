@@ -1,7 +1,6 @@
 package org.datrunk.naked.client.config;
 
 import java.time.Duration;
-
 import org.datrunk.naked.client.CEClient;
 import org.datrunk.naked.client.ClientProperties;
 import org.datrunk.naked.client.RepoClient;
@@ -18,21 +17,24 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @Import(FunctionalClientErrorHandler.class)
-@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
-@ComponentScan(basePackageClasses = { RepoClient.Factory.class })
-@EnableConfigurationProperties({ RepoClient.Properties.class })
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
+@ComponentScan(basePackageClasses = {RepoClient.Factory.class})
+@EnableConfigurationProperties({RepoClient.Properties.class})
 public class Config {
-    @Bean
-    public RestTemplate getRestTemplate(RestTemplateBuilder restTemplateBuilder, ClientProperties properties) {
-        RestTemplate restTemplate = restTemplateBuilder.rootUri(properties.getLocation())
+  @Bean
+  public RestTemplate getRestTemplate(
+      RestTemplateBuilder restTemplateBuilder, ClientProperties properties) {
+    RestTemplate restTemplate =
+        restTemplateBuilder
+            .rootUri(properties.getLocation())
             .setConnectTimeout(Duration.ofSeconds(2))
             .setReadTimeout(Duration.ofSeconds(2))
             .build();
-        return restTemplate;
-    }
+    return restTemplate;
+  }
 
-    @Bean
-    public CEClient.Factory getClientFactory(ClientProperties properties) {
-        return new CEClient.Factory(properties);
-    }
+  @Bean
+  public CEClient.Factory getClientFactory(ClientProperties properties) {
+    return new CEClient.Factory(properties);
+  }
 }

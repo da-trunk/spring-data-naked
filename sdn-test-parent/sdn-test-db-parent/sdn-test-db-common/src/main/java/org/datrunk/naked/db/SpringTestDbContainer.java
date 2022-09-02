@@ -7,10 +7,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
-
+import liquibase.Contexts;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
@@ -34,18 +39,7 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
-
-/**
- * Adds methods to {@link SpringTestContainer} that are useful for RDBMS
- * containers.
- */
+/** Adds methods to {@link SpringTestContainer} that are useful for RDBMS containers. */
 public interface SpringTestDbContainer extends SpringTestContainer {
   String getJdbcUrl();
 
@@ -84,15 +78,14 @@ public interface SpringTestDbContainer extends SpringTestContainer {
     void accept(Liquibase liquibase) throws LiquibaseException;
 
     /**
-     * Returns a composed {@code Consumer} that performs, in sequence, this
-     * operation followed by the {@code after} operation. If performing either
-     * operation throws an exception, it is relayed to the caller of the composed
-     * operation. If performing this operation throws an exception, the
-     * {@code after} operation will not be performed.
+     * Returns a composed {@code Consumer} that performs, in sequence, this operation followed by
+     * the {@code after} operation. If performing either operation throws an exception, it is
+     * relayed to the caller of the composed operation. If performing this operation throws an
+     * exception, the {@code after} operation will not be performed.
      *
      * @param after the operation to perform after this operation
-     * @return a composed {@code Consumer} that performs in sequence this operation
-     *         followed by the {@code after} operation
+     * @return a composed {@code Consumer} that performs in sequence this operation followed by the
+     *     {@code after} operation
      * @throws NullPointerException if {@code after} is null
      */
     default LiquibaseCommand andThen(LiquibaseCommand after) {
@@ -104,9 +97,11 @@ public interface SpringTestDbContainer extends SpringTestContainer {
     }
   }
 
-  default void execute(LiquibaseCommand command, String changeLogFile, String user, String password) throws Exception {
+  default void execute(LiquibaseCommand command, String changeLogFile, String user, String password)
+      throws Exception {
     try (Connection conn = getConnection(user, password)) {
-      Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(conn));
+      Database database =
+          DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(conn));
       try (ClassLoaderResourceAccessor clra = new ClassLoaderResourceAccessor();
           Liquibase liquibase = new Liquibase(changeLogFile, clra, database)) {
         command.accept(liquibase);
@@ -135,9 +130,12 @@ public interface SpringTestDbContainer extends SpringTestContainer {
   default void tag(String changeLog) throws Exception {
     execute(liquibase -> liquibase.tag("0"), changeLog, getUsername(), getPassword());
   }
-  
-  default void execute(LiquibaseCommand command, String changeLogFile, Connection connection) throws Exception {
-    Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+
+  default void execute(LiquibaseCommand command, String changeLogFile, Connection connection)
+      throws Exception {
+    Database database =
+        DatabaseFactory.getInstance()
+            .findCorrectDatabaseImplementation(new JdbcConnection(connection));
     try (ClassLoaderResourceAccessor clra = new ClassLoaderResourceAccessor();
         Liquibase liquibase = new Liquibase(changeLogFile, clra, database)) {
       command.accept(liquibase);
@@ -153,7 +151,10 @@ public interface SpringTestDbContainer extends SpringTestContainer {
 
   default void rollback(String rollBackToTag, Connection connection) throws Exception {
     final Contexts contexts = new Contexts("xe", "production");
-    execute(liquibase -> liquibase.rollback(rollBackToTag, contexts), "schema-update-versioned.xml", connection);
+    execute(
+        liquibase -> liquibase.rollback(rollBackToTag, contexts),
+        "schema-update-versioned.xml",
+        connection);
   }
 
   default void rollback() throws Exception {
@@ -161,7 +162,9 @@ public interface SpringTestDbContainer extends SpringTestContainer {
   }
 
   @SuppressWarnings("resource")
-  default void init(@Nonnull JdbcDatabaseContainer<?> result, final @Nonnull Environment environment,
+  default void init(
+      @Nonnull JdbcDatabaseContainer<?> result,
+      final @Nonnull Environment environment,
       @Nonnull BiConsumer<Integer, Integer> addFixedExposedPort) {
     DockerImageName.parse(result.getDockerImageName()).assertValid();
     result.withNetwork(SpringTestContainers.getNetwork());
@@ -177,7 +180,8 @@ public interface SpringTestDbContainer extends SpringTestContainer {
     if (environment.getProperty("spring.datasource.container.port") == null) {
       result.withReuse(false);
     } else {
-      addFixedExposedPort.accept(Integer.valueOf(environment.getProperty("spring.datasource.container.port")),
+      addFixedExposedPort.accept(
+          Integer.valueOf(environment.getProperty("spring.datasource.container.port")),
           result.getExposedPorts().get(0));
       result.withReuse(true);
     }
@@ -188,9 +192,10 @@ public interface SpringTestDbContainer extends SpringTestContainer {
   void start();
 
   void stop();
-  
+
   @Order(Ordered.HIGHEST_PRECEDENCE)
-  public static class Factory implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+  public static class Factory
+      implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     private static SpringTestDbContainer instance = null;
     private static boolean shouldStop = true;
     private final Class<? extends SpringTestDbContainer> clazz;
@@ -207,12 +212,14 @@ public interface SpringTestDbContainer extends SpringTestContainer {
 
     private void create(ConfigurableApplicationContext ctx) {
       final ConfigurableEnvironment env = ctx.getEnvironment();
-      BindResult<DataSourceProperties> binder = Binder.get(env).bind("spring.datasource", DataSourceProperties.class);
+      BindResult<DataSourceProperties> binder =
+          Binder.get(env).bind("spring.datasource", DataSourceProperties.class);
       DataSourceProperties props = binder.get();
       if (instance == null) {
         final Logger log = LogManager.getLogger();
         try {
-          Constructor<? extends SpringTestDbContainer> constructor = clazz.getConstructor(Environment.class);
+          Constructor<? extends SpringTestDbContainer> constructor =
+              clazz.getConstructor(Environment.class);
           instance = constructor.newInstance(env);
           shouldStop = env.getProperty("spring.datasource.container.port") == null;
         } catch (NoSuchMethodException
@@ -222,7 +229,8 @@ public interface SpringTestDbContainer extends SpringTestContainer {
             | IllegalArgumentException
             | InvocationTargetException e) {
           log.catching(e);
-          throw new IllegalArgumentException("Cannot construct an instance of" + clazz.getName(), e);
+          throw new IllegalArgumentException(
+              "Cannot construct an instance of" + clazz.getName(), e);
         }
         if (props.getUrl() == null) {
           instance.start();
@@ -246,7 +254,8 @@ public interface SpringTestDbContainer extends SpringTestContainer {
       ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
       if (!beanFactory.containsBean(clazz.getName())) {
         beanFactory.registerSingleton(clazz.getName(), instance);
-        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(ctx, "spring.datasource.url=" + instance.getJdbcUrl());
+        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
+            ctx, "spring.datasource.url=" + instance.getJdbcUrl());
       }
     }
 

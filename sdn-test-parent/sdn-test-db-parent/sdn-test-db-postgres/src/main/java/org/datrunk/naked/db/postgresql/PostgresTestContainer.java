@@ -3,14 +3,11 @@ package org.datrunk.naked.db.postgresql;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-
 import javax.annotation.Nonnull;
-
+import lombok.extern.log4j.Log4j2;
 import org.datrunk.naked.db.SpringTestDbContainer;
 import org.springframework.core.env.Environment;
 import org.testcontainers.containers.PostgreSQLContainer;
-
-import lombok.extern.log4j.Log4j2;
 
 /**
  * Spring integration for {@link PostgresTestContainer}.
@@ -18,7 +15,8 @@ import lombok.extern.log4j.Log4j2;
  * @author Ansonator
  */
 @Log4j2
-public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestContainer> implements SpringTestDbContainer {
+public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestContainer>
+    implements SpringTestDbContainer {
   private String jdbcUrl;
 
   @SuppressWarnings("resource")
@@ -26,16 +24,15 @@ public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestConta
     super(environment.getProperty("spring.datasource.container.image"));
     init(this, environment, this::addFixedExposedPort);
     withEnv("POSTGRES_HOST_AUTH_METHOD", "trust");
-//    withStartupTimeout(Duration.ofMinutes(5));
-//    waitingFor(new LogMessageWaitStrategy().withRegEx(".*database system is ready to accept connections.*\\s"));
+    //    withStartupTimeout(Duration.ofMinutes(5));
+    //    waitingFor(new LogMessageWaitStrategy().withRegEx(".*database system is ready to accept
+    // connections.*\\s"));
   }
 
   @Override
   public String getJdbcUrl() {
-    if (jdbcUrl != null)
-      return jdbcUrl;
-    else
-      return super.getJdbcUrl();
+    if (jdbcUrl != null) return jdbcUrl;
+    else return super.getJdbcUrl();
   }
 
   @Override

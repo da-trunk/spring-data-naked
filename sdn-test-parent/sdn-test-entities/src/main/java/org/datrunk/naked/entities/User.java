@@ -1,6 +1,5 @@
 package org.datrunk.naked.entities;
 
-import java.time.LocalDateTime;
 
 import javax.annotation.Nonnull;
 import javax.persistence.Column;
@@ -12,23 +11,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-
-import org.datrunk.naked.entities.IdClass;
-import org.datrunk.naked.entities.bowman.annotation.RemoteResource;
-import org.datrunk.naked.entities.random.Randomizer;
-import org.datrunk.naked.entities.random.RepeatingRandomizer;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
-import org.springframework.lang.NonNull;
-
-import com.github.javafaker.Name;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.datrunk.naked.entities.bowman.annotation.RemoteResource;
+import org.springframework.lang.NonNull;
 
 @Entity
 @RemoteResource("/users")
@@ -44,8 +34,7 @@ public class User extends IdClass<Integer> {
   @Column(insertable = false, updatable = false)
   private Integer id;
 
-  @Nonnull
-  private String firstName;
+  @Nonnull private String firstName;
 
   private String lastName;
 
@@ -53,19 +42,19 @@ public class User extends IdClass<Integer> {
   @Enumerated(EnumType.STRING)
   private Role role;
 
-//  @NonNull
-//  @Column
-//  @DateTimeFormat(iso = ISO.DATE_TIME)
-//  private LocalDateTime createTime = LocalDateTime.now();
-//
-//  public void setCreateTime(String str) {
-//    if (str == null || str.isEmpty() || str.toLowerCase().equals("null"))
-//      createTime = LocalDateTime.now();
-//    else
-//      createTime = LocalDateTime.parse(str);
-//  }
-//
-//  public void setCreateTime(LocalDateTime dt) {
-//    this.createTime = dt;
-//  }
+  //  @NonNull
+  //  @Column
+  //  @DateTimeFormat(iso = ISO.DATE_TIME)
+  //  private LocalDateTime createTime = LocalDateTime.now();
+  //
+  //  public void setCreateTime(String str) {
+  //    if (str == null || str.isEmpty() || str.toLowerCase().equals("null"))
+  //      createTime = LocalDateTime.now();
+  //    else
+  //      createTime = LocalDateTime.parse(str);
+  //  }
+  //
+  //  public void setCreateTime(LocalDateTime dt) {
+  //    this.createTime = dt;
+  //  }
 }

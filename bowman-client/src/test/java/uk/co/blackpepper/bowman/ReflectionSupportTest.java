@@ -6,18 +6,18 @@ import org.junit.rules.ExpectedException;
 
 public class ReflectionSupportTest {
 
-	private ExpectedException thrown = ExpectedException.none();
-	
-	@Rule
-	public ExpectedException getThrown() {
-		return thrown;
-	}
-	
-	@Test
-	public void getIdWhenNoIdAccessor() {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage("No @ResourceId found for java.lang.Object");
+  private ExpectedException thrown = ExpectedException.none();
 
-		ReflectionSupport.getId(new Object());
-	}
+  @Rule
+  public ExpectedException getThrown() {
+    return thrown;
+  }
+
+  @Test
+  public void getIdWhenNoIdAccessor() {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("No @ResourceId found for java.lang.Object");
+
+    ReflectionSupport.getId(new Object());
+  }
 }

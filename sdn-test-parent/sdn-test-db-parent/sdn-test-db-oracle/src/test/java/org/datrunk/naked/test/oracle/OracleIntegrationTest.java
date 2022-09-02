@@ -5,14 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
-
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.datrunk.naked.db.OracleTestContainer;
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -31,16 +31,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import liquibase.exception.LiquibaseException;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ExtendWith({ SpringExtension.class })
+@ExtendWith({SpringExtension.class})
 @TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(initializers = { OracleTestContainer.Factory.class }, classes = { OracleIntegrationTest.Config.class })
+@ContextConfiguration(
+    initializers = {OracleTestContainer.Factory.class},
+    classes = {OracleIntegrationTest.Config.class})
 @EnableConfigurationProperties(DataSourceProperties.class)
 @ActiveProfiles("test")
 @Log4j2
@@ -55,7 +52,7 @@ class OracleIntegrationTest {
     DataSource dataSource(OracleTestContainer db) throws Exception {
       if (!initialized) {
         initialized = true;
-//        db.update("changelog-master.xml");
+        //        db.update("changelog-master.xml");
       }
       return db.getDataSource();
     }
@@ -77,7 +74,7 @@ class OracleIntegrationTest {
   @Test
   void getYValues() throws Exception {
     try {
-    db.executeUpdate("create table points (x number primary key, y number)");
+      db.executeUpdate("create table points (x number primary key, y number)");
     } catch (Exception e) {
       log.catching(e);
     }
@@ -99,8 +96,8 @@ class OracleIntegrationTest {
     }
 
     public static List<Point> findByX(DataSourceWrapper db, int x) throws Exception {
-      return db.executeQuery("select x,y from points where x = ?", stmt -> stmt.setInt(1, x), Point::new);
+      return db.executeQuery(
+          "select x,y from points where x = ?", stmt -> stmt.setInt(1, x), Point::new);
     }
   }
-
 }

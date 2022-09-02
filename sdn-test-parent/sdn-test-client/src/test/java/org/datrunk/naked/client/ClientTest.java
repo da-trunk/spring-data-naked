@@ -4,9 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 import java.time.Duration;
-
 import javax.sql.DataSource;
-
+import liquibase.exception.LiquibaseException;
 import org.datrunk.naked.client.container.TomcatTestContainer;
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
 import org.datrunk.naked.db.mysql.MySqlTestContainer;
@@ -30,15 +29,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
-import liquibase.exception.LiquibaseException;
-
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ExtendWith({ SpringExtension.class })
+@ExtendWith({SpringExtension.class})
 @TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(initializers = { MySqlTestContainer.Factory.class, TomcatTestContainer.Factory.class }, classes = {
-    ClientTest.Config.class, RepoClient.Factory.class })
-@EnableConfigurationProperties({ DataSourceProperties.class, RepoClient.Properties.class })
+@ContextConfiguration(
+    initializers = {MySqlTestContainer.Factory.class, TomcatTestContainer.Factory.class},
+    classes = {ClientTest.Config.class, RepoClient.Factory.class})
+@EnableConfigurationProperties({DataSourceProperties.class, RepoClient.Properties.class})
 @ActiveProfiles("test")
 // @TestMethodOrder(OrderAnnotation.class)
 // @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
@@ -50,9 +48,9 @@ public class ClientTest {
     @Bean
     DataSource dataSource(MySqlTestContainer db) throws LiquibaseException, SQLException {
       if (!initialized) {
-//        db.updateAsSys("liquibase/mysql/init.xml");
-//        db.update("liquibase/mysql/schema-update-versioned.xml");
-//        db.update("liquibase/mysql/content/master.xml");
+        //        db.updateAsSys("liquibase/mysql/init.xml");
+        //        db.update("liquibase/mysql/schema-update-versioned.xml");
+        //        db.update("liquibase/mysql/content/master.xml");
         initialized = true;
       }
       return db.getDataSource();
@@ -64,20 +62,21 @@ public class ClientTest {
     }
 
     @Bean
-    RestTemplate getRestTemplate(TomcatTestContainer server, RestTemplateBuilder restTemplateBuilder) {
-      RestTemplate restTemplate = restTemplateBuilder.rootUri(server.getBaseUri().toASCIIString())
-          .setConnectTimeout(Duration.ofSeconds(2))
-          .setReadTimeout(Duration.ofSeconds(2))
-          .build();
+    RestTemplate getRestTemplate(
+        TomcatTestContainer server, RestTemplateBuilder restTemplateBuilder) {
+      RestTemplate restTemplate =
+          restTemplateBuilder
+              .rootUri(server.getBaseUri().toASCIIString())
+              .setConnectTimeout(Duration.ofSeconds(2))
+              .setReadTimeout(Duration.ofSeconds(2))
+              .build();
       return restTemplate;
     }
   }
 
-  @Autowired
-  private RestTemplate restTemplate;
+  @Autowired private RestTemplate restTemplate;
 
-  @Autowired
-  private MySqlTestContainer mySql;
+  @Autowired private MySqlTestContainer mySql;
 
   @BeforeEach
   void before() throws Exception {
@@ -86,8 +85,7 @@ public class ClientTest {
     assertThat(db).isNotNull();
   }
 
-  @Autowired
-  RepoClient.Factory repoClientFactory;
+  @Autowired RepoClient.Factory repoClientFactory;
 
   @Test
   public void testCreate() {

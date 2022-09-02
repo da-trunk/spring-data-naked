@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URI;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -20,29 +19,29 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 
 public class JsonClientHttpRequestInterceptorTest {
-	
-	private JsonClientHttpRequestInterceptor interceptor;
-	
-	@Before
-	public void setUp() {
-		interceptor = new JsonClientHttpRequestInterceptor();
-	}
-	
-	@Test
-	public void interceptSetsContentTypeAndAcceptHeaders() throws IOException {
-		HttpRequest request = mock(HttpRequest.class);
-		when(request.getHeaders()).thenReturn(new HttpHeaders());
-		when(request.getURI()).thenReturn(URI.create(""));
-		
-		ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
-		
-		interceptor.intercept(request, new byte[] {1}, execution);
-		
-		ArgumentCaptor<HttpRequest> finalRequest = ArgumentCaptor.forClass(HttpRequest.class);
-		verify(execution).execute(finalRequest.capture(), aryEq(new byte[] {1}));
-		
-		HttpHeaders finalHeaders = finalRequest.getValue().getHeaders();
-		assertThat(finalHeaders.getAccept(), contains(MediaType.valueOf("application/hal+json")));
-		assertThat(finalHeaders.getContentType(), is(MediaType.valueOf("application/hal+json")));
-	}
+
+  private JsonClientHttpRequestInterceptor interceptor;
+
+  @Before
+  public void setUp() {
+    interceptor = new JsonClientHttpRequestInterceptor();
+  }
+
+  @Test
+  public void interceptSetsContentTypeAndAcceptHeaders() throws IOException {
+    HttpRequest request = mock(HttpRequest.class);
+    when(request.getHeaders()).thenReturn(new HttpHeaders());
+    when(request.getURI()).thenReturn(URI.create(""));
+
+    ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
+
+    interceptor.intercept(request, new byte[] {1}, execution);
+
+    ArgumentCaptor<HttpRequest> finalRequest = ArgumentCaptor.forClass(HttpRequest.class);
+    verify(execution).execute(finalRequest.capture(), aryEq(new byte[] {1}));
+
+    HttpHeaders finalHeaders = finalRequest.getValue().getHeaders();
+    assertThat(finalHeaders.getAccept(), contains(MediaType.valueOf("application/hal+json")));
+    assertThat(finalHeaders.getContentType(), is(MediaType.valueOf("application/hal+json")));
+  }
 }

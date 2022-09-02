@@ -12,11 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * Moved from <a href="https://github.com/hdpe/bowman/blob/main/client/src/main/java/uk/co/blackpepper/bowman/">hdpe/bowman/client</a> 
- * in 2022 to make this type compatible with the artifacts here. 
- * Modifications include changing the groupId and package name.  
- * The original groupId was me.hdpe.bowman.  The original package name was uk.co.blackpepper.bowman.annotation. 
+ *
+ * Moved from <a href="https://github.com/hdpe/bowman/blob/main/client/src/main/java/uk/co/blackpepper/bowman/">hdpe/bowman/client</a>
+ * in 2022 to make this type compatible with the artifacts here.
+ * Modifications include changing the groupId and package name.
+ * The original groupId was me.hdpe.bowman.  The original package name was uk.co.blackpepper.bowman.annotation.
  * This modified file is still licensed
  * under Apache License, Version 2.0, but with copyright 2022 by io.github.da_trunk.
  */
@@ -29,9 +29,8 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation to mark a property as the entity's {@link java.net.URI} ID.
- * 
+ *
  * @author Ryan Pickett
- * 
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

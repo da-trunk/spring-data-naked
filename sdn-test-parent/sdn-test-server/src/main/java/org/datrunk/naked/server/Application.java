@@ -1,8 +1,8 @@
 package org.datrunk.naked.server;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.datrunk.naked.entities.User;
@@ -38,8 +38,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 @SpringBootApplication
 @Import({Application.Config.class})
 @PropertySources({
@@ -62,16 +60,16 @@ public class Application extends SpringBootServletInitializer {
   @EnableConfigurationProperties(TomcatConnectionProperties.class)
   @EnableAutoConfiguration
   public static class Config {
-      @Bean
-      RepositoryRestConfigurer repositoryRestConfigurer(EntityManager entityManager) {
-          return RepositoryRestConfigurer.withConfig(
-                  config -> {
-                      config.exposeIdsFor(
-                              entityManager.getMetamodel().getEntities().stream()
-                                      .map(javax.persistence.metamodel.Type::getJavaType)
-                                      .toArray(Class[]::new));
-                  });
-      }
+    @Bean
+    RepositoryRestConfigurer repositoryRestConfigurer(EntityManager entityManager) {
+      return RepositoryRestConfigurer.withConfig(
+          config -> {
+            config.exposeIdsFor(
+                entityManager.getMetamodel().getEntities().stream()
+                    .map(javax.persistence.metamodel.Type::getJavaType)
+                    .toArray(Class[]::new));
+          });
+    }
 
     @Bean
     com.fasterxml.jackson.databind.Module javaTimeModule() {
@@ -79,24 +77,25 @@ public class Application extends SpringBootServletInitializer {
       return module;
     }
 
-//    @Bean
-//    public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
-//        return builder -> builder.
-//          .serializers(LOCAL_DATETIME_SERIALIZER);
-//    }
-//    
-//    @Bean
-//    @Primary
-//    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
-//        ObjectMapper objectMapper = builder.build();
-//        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-//        return objectMapper;
-//    }
+    //    @Bean
+    //    public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
+    //        return builder -> builder.
+    //          .serializers(LOCAL_DATETIME_SERIALIZER);
+    //    }
+    //
+    //    @Bean
+    //    @Primary
+    //    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+    //        ObjectMapper objectMapper = builder.build();
+    //        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    //        return objectMapper;
+    //    }
 
-//    @Bean
-//    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
-//      return new Jackson2ObjectMapperBuilder().modules(new JavaTimeModule()).serializationInclusion(Include.NON_NULL);
-//    }
+    //    @Bean
+    //    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
+    //      return new Jackson2ObjectMapperBuilder().modules(new
+    // JavaTimeModule()).serializationInclusion(Include.NON_NULL);
+    //    }
 
     // @Bean
     // public SpringDataRestTransactionAspect
@@ -211,8 +210,8 @@ public class Application extends SpringBootServletInitializer {
   }
 
   // @see {@link ApplicationContextProvider}
-//  @Bean
-//  public static ApplicationContextProvider contextProvider() {
-//    return new ApplicationContextProvider();
-//  }
+  //  @Bean
+  //  public static ApplicationContextProvider contextProvider() {
+  //    return new ApplicationContextProvider();
+  //  }
 }

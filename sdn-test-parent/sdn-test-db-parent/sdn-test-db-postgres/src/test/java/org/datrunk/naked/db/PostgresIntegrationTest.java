@@ -5,10 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
-
+import liquibase.exception.LiquibaseException;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
 import org.datrunk.naked.db.postgresql.PostgresTestContainer;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,15 +32,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import liquibase.exception.LiquibaseException;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ExtendWith({ SpringExtension.class })
+@ExtendWith({SpringExtension.class})
 @TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(initializers = { PostgresTestContainer.Factory.class }, classes = { PostgresIntegrationTest.Config.class })
+@ContextConfiguration(
+    initializers = {PostgresTestContainer.Factory.class},
+    classes = {PostgresIntegrationTest.Config.class})
 @EnableConfigurationProperties(DataSourceProperties.class)
 @ActiveProfiles("test")
 @Disabled("connection refused")
@@ -93,8 +92,8 @@ class PostgresIntegrationTest {
     }
 
     public static List<Point> findByX(DataSourceWrapper db, int x) throws Exception {
-      return db.executeQuery("select x,y from points where x = ?", stmt -> stmt.setInt(1, x), Point::new);
+      return db.executeQuery(
+          "select x,y from points where x = ?", stmt -> stmt.setInt(1, x), Point::new);
     }
   }
-
 }

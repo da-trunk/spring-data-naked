@@ -4,9 +4,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.Duration;
-
 import javax.annotation.Nonnull;
-
+import liquibase.Contexts;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.env.Environment;
@@ -18,16 +22,9 @@ import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 import org.testcontainers.utility.DockerImageName;
 
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
-
 /**
- * Extends {@link OracleContainer} with properties and methods specific to our
- * Oracle database projects.
+ * Extends {@link OracleContainer} with properties and methods specific to our Oracle database
+ * projects.
  *
  * @author Ansonator
  */
@@ -37,7 +34,9 @@ public class OracleTestContainer extends OracleContainer implements SpringTestDb
   private String jdbcUrl;
 
   public static enum Type {
-    xe11, xe18, xe21;
+    xe11,
+    xe18,
+    xe21;
   }
 
   @SuppressWarnings("resource")
@@ -47,41 +46,41 @@ public class OracleTestContainer extends OracleContainer implements SpringTestDb
     withEnv("ORACLE_PWD", "password");
     type = Type.valueOf(environment.getProperty("spring.datasource.container.type"));
     switch (type) {
-    case xe11:
-      withSharedMemorySize(FileUtils.ONE_GB).withEnv("ORACLE_SID", "oracle")
-          .withEnv("ORACLE_PDB", "oracle")
-          .withDatabaseName("XE")
-          .waitingFor(new LogMessageWaitStrategy().withRegEx("DATABASE IS READY TO USE!\\n"));
-      break;
-    case xe18:
-    case xe21:
-//        final String tmpDir = getHostTempDir(type.name()).toAbsolutePath().toString();
-      this
-      //.withEnv("ORACLE_PDB", "XEPDB1")
-      .withEnv("ORACLE_PASSWORD", getPassword())
-          //.withFileSystemBind(tmpDir, "/opt/oracle/oradata", BindMode.READ_WRITE)
-      .waitingFor(new LogMessageWaitStrategy().withRegEx("DATABASE IS READY TO USE!\\n"))
-//          .waitingFor(new LogMessageWaitStrategy().withRegEx("Completed: ALTER DATABASE OPEN\\s*"))
-          .withStartupTimeout(Duration.ofMinutes(5)); // necessary when building for the first time on the server
-      break;
-    default:
-      break;
+      case xe11:
+        withSharedMemorySize(FileUtils.ONE_GB)
+            .withEnv("ORACLE_SID", "oracle")
+            .withEnv("ORACLE_PDB", "oracle")
+            .withDatabaseName("XE")
+            .waitingFor(new LogMessageWaitStrategy().withRegEx("DATABASE IS READY TO USE!\\n"));
+        break;
+      case xe18:
+      case xe21:
+        //        final String tmpDir = getHostTempDir(type.name()).toAbsolutePath().toString();
+        this
+            // .withEnv("ORACLE_PDB", "XEPDB1")
+            .withEnv("ORACLE_PASSWORD", getPassword())
+            // .withFileSystemBind(tmpDir, "/opt/oracle/oradata", BindMode.READ_WRITE)
+            .waitingFor(new LogMessageWaitStrategy().withRegEx("DATABASE IS READY TO USE!\\n"))
+            //          .waitingFor(new LogMessageWaitStrategy().withRegEx("Completed: ALTER
+            // DATABASE OPEN\\s*"))
+            .withStartupTimeout(
+                Duration.ofMinutes(5)); // necessary when building for the first time on the server
+        break;
+      default:
+        break;
     }
   }
-  
+
   private static DockerImageName getImageName(final @Nonnull Environment environment) {
-	  String name = environment.getProperty("spring.datasource.container.image");
-	  if (name == null)
-		  name = "gvenzl/oracle-xe:21.3.0-slim-faststart";
-	  return DockerImageName.parse(name).asCompatibleSubstituteFor("gvenzl/oracle-xe");
+    String name = environment.getProperty("spring.datasource.container.image");
+    if (name == null) name = "gvenzl/oracle-xe:21.3.0-slim-faststart";
+    return DockerImageName.parse(name).asCompatibleSubstituteFor("gvenzl/oracle-xe");
   }
 
   @Override
   public String getJdbcUrl() {
-    if (jdbcUrl != null)
-      return jdbcUrl;
-    else
-      return super.getJdbcUrl();
+    if (jdbcUrl != null) return jdbcUrl;
+    else return super.getJdbcUrl();
   }
 
   public void setJdbcUrl(String url) {
@@ -94,17 +93,18 @@ public class OracleTestContainer extends OracleContainer implements SpringTestDb
     log.info("{} started at {}", getClass().getSimpleName(), getJdbcUrl());
     createTestDb();
   }
-  
+
   protected void createTestDb() {
-//	  {
-//	  String rootJdbcUrl = "jdbc:oracle:thin:" + "@" + getHost() + ":" + getOraclePort() + "/XE";
-//	    final DriverManagerDataSource dataSource = new DriverManagerDataSource(rootJdbcUrl, "SYS AS SYSDBA",
-//	            getPassword());
-//	    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-//	    jdbc.execute("alter system set COMPATIBLE='19.6.0' scope=spfile");
-//	  }
-    final DriverManagerDataSource dataSource = new DriverManagerDataSource(getJdbcUrl(), "SYSTEM",
-            getPassword());
+    //	  {
+    //	  String rootJdbcUrl = "jdbc:oracle:thin:" + "@" + getHost() + ":" + getOraclePort() + "/XE";
+    //	    final DriverManagerDataSource dataSource = new DriverManagerDataSource(rootJdbcUrl, "SYS
+    // AS SYSDBA",
+    //	            getPassword());
+    //	    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    //	    jdbc.execute("alter system set COMPATIBLE='19.6.0' scope=spfile");
+    //	  }
+    final DriverManagerDataSource dataSource =
+        new DriverManagerDataSource(getJdbcUrl(), "SYSTEM", getPassword());
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     jdbc.execute("GRANT ALL PRIVILEGES TO " + getUsername());
   }
@@ -130,18 +130,22 @@ public class OracleTestContainer extends OracleContainer implements SpringTestDb
   }
 
   /**
-   * Drop and recreate the provided user by executing "schema-drop-create.xml".
-   * This file must be found on the root classpath. If the user is different from
-   * the one this container was originally created with,
-   * "schema-drop-create-${user}.xml" is executed instead.
+   * Drop and recreate the provided user by executing "schema-drop-create.xml". This file must be
+   * found on the root classpath. If the user is different from the one this container was
+   * originally created with, "schema-drop-create-${user}.xml" is executed instead.
    *
    * @param user
-   * @throws Exception 
+   * @throws Exception
    */
   public void create(String user) throws Exception {
     try (Connection connection = getSysConnection()) {
-      String changeSet = user.equals(getUsername()) ? "schema-drop-create.xml" : String.format("schema-drop-create-%s.xml", user);
-      Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+      String changeSet =
+          user.equals(getUsername())
+              ? "schema-drop-create.xml"
+              : String.format("schema-drop-create-%s.xml", user);
+      Database database =
+          DatabaseFactory.getInstance()
+              .findCorrectDatabaseImplementation(new JdbcConnection(connection));
       try (ClassLoaderResourceAccessor clra = new ClassLoaderResourceAccessor();
           Liquibase liquibase = new Liquibase(changeSet, clra, database)) {
         Contexts contexts = new Contexts("xe");
@@ -152,7 +156,7 @@ public class OracleTestContainer extends OracleContainer implements SpringTestDb
 
   /**
    * Apply schema in a fresh database. After it is built, tag "0" is applied.
-   * 
+   *
    * @throws Exception
    */
   public void installVersioned(String changeLog) throws Exception {

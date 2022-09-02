@@ -4,12 +4,11 @@ import java.net.URI;
 
 /**
  * Entities supported from by {@link CEClient} should implement this interface.
- * 
- * @author da-trunk@outlook.com
  *
+ * @author da-trunk@outlook.com
  */
 public interface WithUri {
-	URI getUri();
+  URI getUri();
 
-	void setUri(URI uri);
+  void setUri(URI uri);
 }

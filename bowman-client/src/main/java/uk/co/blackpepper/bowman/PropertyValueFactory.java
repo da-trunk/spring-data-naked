@@ -4,5 +4,5 @@ import java.util.Collection;
 
 interface PropertyValueFactory {
 
-	<T extends Collection<?>> T createCollection(Class<?> collectionType);
+  <T extends Collection<?>> T createCollection(Class<?> collectionType);
 }

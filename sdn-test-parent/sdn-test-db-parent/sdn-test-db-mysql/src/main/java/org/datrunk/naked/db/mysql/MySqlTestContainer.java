@@ -3,16 +3,13 @@ package org.datrunk.naked.db.mysql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
 import javax.annotation.Nonnull;
-
+import lombok.extern.log4j.Log4j2;
 import org.datrunk.naked.db.SpringTestDbContainer;
 import org.springframework.core.env.Environment;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
-
-import lombok.extern.log4j.Log4j2;
 
 /**
  * Spring integration for {@link MySQLContainer}.

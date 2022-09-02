@@ -1,5 +1,8 @@
 package org.datrunk.naked.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -10,7 +13,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.datrunk.naked.entities.CollectionDTO;
 import org.datrunk.naked.entities.IdClass;
 import org.datrunk.naked.entities.bowman.annotation.RemoteResource;
@@ -30,26 +35,15 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
-
 @Log4j2
 public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
   protected final RestTemplate restTemplate;
   private final Class<T> entityClass;
   private final Class<ID> idClass;
   private final String path;
-  @Getter
-  private final CEClient<T> client;
+  @Getter private final CEClient<T> client;
   private final CollectionDTO<T> queue = CollectionDTO.create();
-  @Getter
-  @Setter
-  private int maxSize = 1;
+  @Getter @Setter private int maxSize = 1;
 
   private final ParameterizedTypeReference<CollectionDTO<T>> typeRef;
   private final String naturalIdPath;
@@ -57,20 +51,18 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
   private final Function<T, Object> naturalIdRetrievalFn;
 
   @ConfigurationProperties("client.repo")
-  public static class Properties extends ClientProperties {
-  };
+  public static class Properties extends ClientProperties {}
+  ;
 
   @Component
   public static class Factory {
-    @Getter
-    private final Properties properties;
-    @Getter
-    private final RestTemplate restTemplate;
-    @Getter
-    private final CEClient.Factory clientFactory;
+    @Getter private final Properties properties;
+    @Getter private final RestTemplate restTemplate;
+    @Getter private final CEClient.Factory clientFactory;
 
     @Autowired
-    protected Factory(Properties properties, RestTemplate restTemplate, CEClient.Factory clientFactory) {
+    protected Factory(
+        Properties properties, RestTemplate restTemplate, CEClient.Factory clientFactory) {
       this.properties = properties;
       this.restTemplate = restTemplate;
       this.clientFactory = clientFactory;
@@ -80,47 +72,88 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
       if (entityClass.getAnnotation(RemoteResource.class) != null) {
         return entityClass.getAnnotation(RemoteResource.class).value();
       } else {
-        return entityClass.getSimpleName().substring(0, 1).toLowerCase() + entityClass.getSimpleName().substring(1) + "s";
+        return entityClass.getSimpleName().substring(0, 1).toLowerCase()
+            + entityClass.getSimpleName().substring(1)
+            + "s";
       }
     }
 
-    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(Class<T> entityClass, Class<ID> idClass) {
+    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(
+        Class<T> entityClass, Class<ID> idClass) {
       return create(entityClass, idClass, getPath(entityClass));
     }
 
-    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(Class<T> entityClass, Class<ID> idClass, String path) {
-      return new RepoClient<>(properties, path, restTemplate, clientFactory, entityClass, idClass, null, null, null);
+    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(
+        Class<T> entityClass, Class<ID> idClass, String path) {
+      return new RepoClient<>(
+          properties, path, restTemplate, clientFactory, entityClass, idClass, null, null, null);
     }
 
-    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(Class<T> entityClass, Class<ID> idClass, String naturalIdPath,
-        String naturalIdName, Function<T, Object> naturalIdRetrievalFn) {
-      return new RepoClient<>(properties, getPath(entityClass), restTemplate, clientFactory, entityClass, idClass, naturalIdPath,
-          naturalIdName, naturalIdRetrievalFn);
-    }
-
-    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(Class<T> entityClass, Class<ID> idClass, String path, String naturalIdPath,
-        String naturalIdName, Function<T, Object> naturalIdRetrievalFn) {
-      return new RepoClient<>(properties, path, restTemplate, clientFactory, entityClass, idClass, naturalIdPath, naturalIdName,
+    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(
+        Class<T> entityClass,
+        Class<ID> idClass,
+        String naturalIdPath,
+        String naturalIdName,
+        Function<T, Object> naturalIdRetrievalFn) {
+      return new RepoClient<>(
+          properties,
+          getPath(entityClass),
+          restTemplate,
+          clientFactory,
+          entityClass,
+          idClass,
+          naturalIdPath,
+          naturalIdName,
           naturalIdRetrievalFn);
     }
 
-    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(Function<Factory, RepoClient<T, ID>> fn) {
+    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(
+        Class<T> entityClass,
+        Class<ID> idClass,
+        String path,
+        String naturalIdPath,
+        String naturalIdName,
+        Function<T, Object> naturalIdRetrievalFn) {
+      return new RepoClient<>(
+          properties,
+          path,
+          restTemplate,
+          clientFactory,
+          entityClass,
+          idClass,
+          naturalIdPath,
+          naturalIdName,
+          naturalIdRetrievalFn);
+    }
+
+    public <T extends IdClass<ID>, ID> RepoClient<T, ID> create(
+        Function<Factory, RepoClient<T, ID>> fn) {
       return fn.apply(this);
     }
   }
 
-  public RepoClient(Properties properties, String path, RestTemplate restTemplate, CEClient.Factory clientFactory, Class<T> entityClass,
-      Class<ID> idClass, String naturalIdPath, String naturalIdName, Function<T, Object> naturalIdRetrievalFn) {
+  public RepoClient(
+      Properties properties,
+      String path,
+      RestTemplate restTemplate,
+      CEClient.Factory clientFactory,
+      Class<T> entityClass,
+      Class<ID> idClass,
+      String naturalIdPath,
+      String naturalIdName,
+      Function<T, Object> naturalIdRetrievalFn) {
     super(restTemplate, properties);
     this.restTemplate = restTemplate;
     this.entityClass = entityClass;
     this.idClass = idClass;
-    this.typeRef = new ParameterizedTypeReference<CollectionDTO<T>>() {
-      @Override
-      public Type getType() {
-        return new MyParameterizedTypeImpl((ParameterizedType) super.getType(), new Type[] { entityClass });
-      }
-    };
+    this.typeRef =
+        new ParameterizedTypeReference<CollectionDTO<T>>() {
+          @Override
+          public Type getType() {
+            return new MyParameterizedTypeImpl(
+                (ParameterizedType) super.getType(), new Type[] {entityClass});
+          }
+        };
     this.path = path;
     client = clientFactory.create(entityClass);
     this.naturalIdPath = naturalIdPath;
@@ -156,7 +189,8 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
 
   public T findByNaturalId(final T entity) {
     if (naturalIdName == null) {
-      throw new IllegalStateException(String.format("Client<%s, %s> has not registered a natural id", entityClass, idClass));
+      throw new IllegalStateException(
+          String.format("Client<%s, %s> has not registered a natural id", entityClass, idClass));
     }
     return client.search(naturalIdPath, naturalIdName, naturalIdRetrievalFn.apply(entity));
   }
@@ -167,8 +201,12 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
     try {
       uri = client.post(entity);
     } catch (HttpClientErrorException.Conflict ex) {
-      log.warn("RepoClient<{}, {}>::save was unable to persist {} due to \"{}\".  Assuming it has already been persisted.",
-          entityClass.getSimpleName(), idClass.getSimpleName(), entity, ex.getMessage());
+      log.warn(
+          "RepoClient<{}, {}>::save was unable to persist {} due to \"{}\".  Assuming it has already been persisted.",
+          entityClass.getSimpleName(),
+          idClass.getSimpleName(),
+          entity,
+          ex.getMessage());
       final T existing;
       if (naturalIdName != null) {
         uri = entity.getUri();
@@ -189,8 +227,9 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
         assert (patched != null);
         assert (patched.getId() != null);
         assert (patched.getUri() != null);
-        assert (patched.equals(entity)); // if this is not true, we would need to assign entity = patched. That would
-                                         // create a copy
+        assert (patched.equals(
+            entity)); // if this is not true, we would need to assign entity = patched. That would
+        // create a copy
         // and force the client to update its references elsewhere.
       }
     }
@@ -249,17 +288,16 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
   }
 
   public void deleteAll(Collection<T> entities) {
-    for (T entity : entities)
-      delete(entity);
+    for (T entity : entities) delete(entity);
   }
 
   /**
-   * Store the provided entity in an in-memory queue. Call {@link #flush} when the
-   * queue reaches its configured maximum size.
-   * 
+   * Store the provided entity in an in-memory queue. Call {@link #flush} when the queue reaches its
+   * configured maximum size.
+   *
    * @param entity to persist
-   * @return if {@link #flush} was called, a list of entities returned from the
-   *         server after they were persisted. Otherwise, an empty list.
+   * @return if {@link #flush} was called, a list of entities returned from the server after they
+   *     were persisted. Otherwise, an empty list.
    */
   public List<T> persist(T entity) {
     queue.add(entity);
@@ -270,12 +308,12 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
   }
 
   /**
-   * Store the provided entities in an in-memory queue. Call {@link #flush} when
-   * the queue reaches its configured maximum size.
-   * 
+   * Store the provided entities in an in-memory queue. Call {@link #flush} when the queue reaches
+   * its configured maximum size.
+   *
    * @param entities to persist
-   * @return if {@link #flush} was called, a list of entities returned from the
-   *         server after they were persisted. Otherwise, an empty list.
+   * @return if {@link #flush} was called, a list of entities returned from the server after they
+   *     were persisted. Otherwise, an empty list.
    */
   public List<T> persist(Collection<T> entities) {
     List<T> flushResults = new ArrayList<>();
@@ -299,22 +337,23 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
 
   /**
    * Sends any buffered entities to the database.
-   * 
+   *
    * @return a list of entities returned by the database after persisting them
    */
   public List<T> flush() {
     CollectionModel<EntityModel<T>> result = client.saveAll(queue);
     queue.clear();
-    return result.getContent().stream().map(entityModel -> entityModel.getContent()).collect(Collectors.toList());
+    return result.getContent().stream()
+        .map(entityModel -> entityModel.getContent())
+        .collect(Collectors.toList());
   }
 
   /**
-   * Persist the provided entities in the database. Unlike {@link #persist}, this
-   * method doesn't buffer the entities. It flushes them immediately.
-   * 
+   * Persist the provided entities in the database. Unlike {@link #persist}, this method doesn't
+   * buffer the entities. It flushes them immediately.
+   *
    * @param entities to persist
-   * @return a list of entities returned from the server after they were
-   *         persisted.
+   * @return a list of entities returned from the server after they were persisted.
    */
   public List<T> saveAll(Collection<T> entities) {
     final int maxSize = getMaxSize();
@@ -327,7 +366,7 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
 
   /**
    * Persist the provided entities
-   * 
+   *
    * @param entities to persist
    * @return the persisted entities
    * @throws JsonProcessingException
@@ -346,7 +385,8 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<CollectionDTO<T>> request = new HttpEntity<>(queue, headers);
     URI uri = getBaseURIBuilder().build().toUri();
-    ResponseEntity<CollectionDTO<T>> actual = restTemplate.exchange(uri, HttpMethod.POST, request, typeRef);
+    ResponseEntity<CollectionDTO<T>> actual =
+        restTemplate.exchange(uri, HttpMethod.POST, request, typeRef);
     return actual.getBody().getEntities();
   }
 }

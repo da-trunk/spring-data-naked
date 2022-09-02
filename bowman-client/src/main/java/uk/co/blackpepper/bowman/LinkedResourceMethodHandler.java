@@ -9,194 +9,202 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.datrunk.naked.entities.WithUri;
 import org.datrunk.naked.entities.bowman.annotation.LinkedResource;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
 
 class LinkedResourceMethodHandler extends AbstractPropertyAwareMethodHandler {
 
-	private static final class LinkedResourceResult {
-		
-		private Object value;
-		
-		LinkedResourceResult(Object value) {
-			this.value = value;
-		}
-		
-		Object getValue() {
-			return value;
-		}
-	}
-	
-	private final EntityModel resource;
+  private static final class LinkedResourceResult {
 
-	private final RestOperations restOperations;
+    private Object value;
 
-	private final ClientProxyFactory proxyFactory;
+    LinkedResourceResult(Object value) {
+      this.value = value;
+    }
 
-	private final PropertyValueFactory propertyValueFactory;
-	
-	private final MethodLinkAttributesResolver methodLinkAttributesResolver;
-	
-	private final MethodLinkUriResolver methodLinkUriResolver;
-	
-	private final Map<String, LinkedResourceResult> linkedResourceResults = new HashMap<>();
+    Object getValue() {
+      return value;
+    }
+  }
 
-	LinkedResourceMethodHandler(EntityModel resource, RestOperations restOperations, ClientProxyFactory proxyFactory) {
-		this(resource, restOperations, proxyFactory, new DefaultPropertyValueFactory(),
-			new MethodLinkAttributesResolver(), new MethodLinkUriResolver());
-	}
+  private final EntityModel resource;
 
-	LinkedResourceMethodHandler(EntityModel resource, RestOperations restOperations, ClientProxyFactory proxyFactory,
-		PropertyValueFactory propertyValueFactory, MethodLinkAttributesResolver methodLinkAttributesResolver,
-		MethodLinkUriResolver methodLinkUriResolver) {
-		
-		super(resource.getContent().getClass());
-		
-		this.resource = resource;
-		this.restOperations = restOperations;
-		this.proxyFactory = proxyFactory;
-		this.propertyValueFactory = propertyValueFactory;
-		this.methodLinkAttributesResolver = methodLinkAttributesResolver;
-		this.methodLinkUriResolver = methodLinkUriResolver;
-	}
+  private final RestOperations restOperations;
 
-	@Override
-	public boolean supports(Method method) {
-		if (isSetter(method)) {
-			Method getter = getGetterFromSetter(method);
-			if (getter != null) {
-				return getter.isAnnotationPresent(LinkedResource.class);
-			}
-		}
+  private final ClientProxyFactory proxyFactory;
 
-		return method.isAnnotationPresent(LinkedResource.class);
-	}
+  private final PropertyValueFactory propertyValueFactory;
 
-	@Override
-	public Object invoke(Object self, Method method, Method proceed, Object[] args)
-	throws InvocationTargetException, IllegalAccessException {
-		if (isSetter(method)) {
-			invokeSetterMethod(method, args);
-			return null;
-		}
-		else {
-			return invokeAnnotatedMethod(self, method, proceed, args);
-		}
-	}
+  private final MethodLinkAttributesResolver methodLinkAttributesResolver;
 
-	private void invokeSetterMethod(Method method, Object[] args) {
-		final String getterName = getGetterFromSetter(method).getName();
-		linkedResourceResults.put(getterName, new LinkedResourceResult(args[0]));
-	}
+  private final MethodLinkUriResolver methodLinkUriResolver;
 
-	private Method getGetterFromSetter(Method method) {
-		return Arrays.stream(getContentBeanInfo().getPropertyDescriptors())
-				.filter(pd -> method.equals(pd.getWriteMethod()))
-				.collect(Collectors.toList()).get(0).getReadMethod();
-	}
+  private final Map<String, LinkedResourceResult> linkedResourceResults = new HashMap<>();
 
-	private Object invokeAnnotatedMethod(Object self, Method method, Method proceed, Object[] args)
-	throws InvocationTargetException, IllegalAccessException {
-		LinkedResourceResult result = linkedResourceResults.get(method.getName());
+  LinkedResourceMethodHandler(
+      EntityModel resource, RestOperations restOperations, ClientProxyFactory proxyFactory) {
+    this(
+        resource,
+        restOperations,
+        proxyFactory,
+        new DefaultPropertyValueFactory(),
+        new MethodLinkAttributesResolver(),
+        new MethodLinkUriResolver());
+  }
 
-		if (result == null) {
-			Object resultValue = resolveLinkedResource(self, method, proceed, args);
-			
-			result = new LinkedResourceResult(resultValue);
+  LinkedResourceMethodHandler(
+      EntityModel resource,
+      RestOperations restOperations,
+      ClientProxyFactory proxyFactory,
+      PropertyValueFactory propertyValueFactory,
+      MethodLinkAttributesResolver methodLinkAttributesResolver,
+      MethodLinkUriResolver methodLinkUriResolver) {
 
-			linkedResourceResults.put(method.getName(), result);
-		}
+    super(resource.getContent().getClass());
 
-		return result.getValue();
-	}
+    this.resource = resource;
+    this.restOperations = restOperations;
+    this.proxyFactory = proxyFactory;
+    this.propertyValueFactory = propertyValueFactory;
+    this.methodLinkAttributesResolver = methodLinkAttributesResolver;
+    this.methodLinkUriResolver = methodLinkUriResolver;
+  }
 
-	private Object resolveLinkedResource(Object self, Method method, Method proceed, Object[] args)
-			throws IllegalAccessException, InvocationTargetException {
-		
-		boolean isCollection = Collection.class.isAssignableFrom(method.getReturnType());
-		
-		MethodLinkAttributes attribs = methodLinkAttributesResolver.resolveForMethod(method);
-		
-		URI associationResource;
-		
-		try {
-			associationResource = methodLinkUriResolver.resolveForMethod(resource, attribs.getLinkName(), args);
-		}
-		catch (NoSuchLinkException exception) {
-			if (attribs.isOptional()) {
-				return isCollection ? createCollectionForMethod(method) : null;
-			}
-			
-			throw exception;
-		}
-		
-		if (isCollection) {
-			Class<?> linkedEntityType = (Class<?>) ((ParameterizedType) method.getGenericReturnType())
-				.getActualTypeArguments()[0];
+  @Override
+  public boolean supports(Method method) {
+    if (isSetter(method)) {
+      Method getter = getGetterFromSetter(method);
+      if (getter != null) {
+        return getter.isAnnotationPresent(LinkedResource.class);
+      }
+    }
 
-			if (proceed == null) {
-				return resolveCollectionLinkedResource(getLinkedResources(associationResource,
-						linkedEntityType), method);
-			}
-			else {
-				return resolveCollectionLinkedResource(getLinkedResources(associationResource, linkedEntityType),
-						self, proceed);
-			}
-		}
+    return method.isAnnotationPresent(LinkedResource.class);
+  }
 
-		return resolveSingleLinkedResource(associationResource, method.getReturnType());
-	}
+  @Override
+  public Object invoke(Object self, Method method, Method proceed, Object[] args)
+      throws InvocationTargetException, IllegalAccessException {
+    if (isSetter(method)) {
+      invokeSetterMethod(method, args);
+      return null;
+    } else {
+      return invokeAnnotatedMethod(self, method, proceed, args);
+    }
+  }
 
-	private <F> F resolveSingleLinkedResource(URI associationResource, Class<F> linkedEntityType) {
-		EntityModel<F> linkedResource = restOperations.getResource(associationResource, linkedEntityType);
+  private void invokeSetterMethod(Method method, Object[] args) {
+    final String getterName = getGetterFromSetter(method).getName();
+    linkedResourceResults.put(getterName, new LinkedResourceResult(args[0]));
+  }
 
-		if (linkedResource == null) {
-			return null;
-		}
+  private Method getGetterFromSetter(Method method) {
+    return Arrays.stream(getContentBeanInfo().getPropertyDescriptors())
+        .filter(pd -> method.equals(pd.getWriteMethod()))
+        .collect(Collectors.toList())
+        .get(0)
+        .getReadMethod();
+  }
 
-		return proxyFactory.create(linkedResource, restOperations);
-	}
-	
-	private <F> Collection<F> resolveCollectionLinkedResource(CollectionModel<EntityModel<F>> resources,
-		Object contextEntity,
-		Method originalMethod) throws IllegalAccessException, InvocationTargetException {
+  private Object invokeAnnotatedMethod(Object self, Method method, Method proceed, Object[] args)
+      throws InvocationTargetException, IllegalAccessException {
+    LinkedResourceResult result = linkedResourceResults.get(method.getName());
 
-		@SuppressWarnings("unchecked")
-		Collection<F> collection = (Collection<F>) originalMethod.invoke(contextEntity);
+    if (result == null) {
+      Object resultValue = resolveLinkedResource(self, method, proceed, args);
 
-		if (collection == null) {
-			collection = createCollectionForMethod(originalMethod);
-		}
-		else {
-			collection.clear();
-		}
-		return updateCollectionWithLinkedResources(collection, resources);
-	}
-	
-	private <F> Collection<F> resolveCollectionLinkedResource(CollectionModel<EntityModel<F>> resources,
-		Method method) {
-		return updateCollectionWithLinkedResources(
-			createCollectionForMethod(method), resources);
-	}
+      result = new LinkedResourceResult(resultValue);
 
-	private <F> Collection<F> updateCollectionWithLinkedResources(Collection<F> collection,
-		CollectionModel<EntityModel<F>> resources) {
-		for (EntityModel<F> fResource : resources) {
-			collection.add(proxyFactory.create(fResource, restOperations));
-		}
+      linkedResourceResults.put(method.getName(), result);
+    }
 
-		return collection;
-	}
+    return result.getValue();
+  }
 
-	private <F> CollectionModel<EntityModel<F>> getLinkedResources(URI associationResource, Class<F> linkedEntityType) {
-		return restOperations.getResources(associationResource, linkedEntityType);
-	}
-	
-	private <F> Collection<F> createCollectionForMethod(Method method) {
-		return propertyValueFactory.createCollection(method.getReturnType());
-	}
+  private Object resolveLinkedResource(Object self, Method method, Method proceed, Object[] args)
+      throws IllegalAccessException, InvocationTargetException {
+
+    boolean isCollection = Collection.class.isAssignableFrom(method.getReturnType());
+
+    MethodLinkAttributes attribs = methodLinkAttributesResolver.resolveForMethod(method);
+
+    URI associationResource;
+
+    try {
+      associationResource =
+          methodLinkUriResolver.resolveForMethod(resource, attribs.getLinkName(), args);
+    } catch (NoSuchLinkException exception) {
+      if (attribs.isOptional()) {
+        return isCollection ? createCollectionForMethod(method) : null;
+      }
+
+      throw exception;
+    }
+
+    if (isCollection) {
+      Class<?> linkedEntityType =
+          (Class<?>)
+              ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+
+      if (proceed == null) {
+        return resolveCollectionLinkedResource(
+            getLinkedResources(associationResource, linkedEntityType), method);
+      } else {
+        return resolveCollectionLinkedResource(
+            getLinkedResources(associationResource, linkedEntityType), self, proceed);
+      }
+    }
+
+    return resolveSingleLinkedResource(associationResource, method.getReturnType());
+  }
+
+  private <F> F resolveSingleLinkedResource(URI associationResource, Class<F> linkedEntityType) {
+    EntityModel<F> linkedResource =
+        restOperations.getResource(associationResource, linkedEntityType);
+
+    if (linkedResource == null) {
+      return null;
+    }
+
+    return proxyFactory.create(linkedResource, restOperations);
+  }
+
+  private <F> Collection<F> resolveCollectionLinkedResource(
+      CollectionModel<EntityModel<F>> resources, Object contextEntity, Method originalMethod)
+      throws IllegalAccessException, InvocationTargetException {
+
+    @SuppressWarnings("unchecked")
+    Collection<F> collection = (Collection<F>) originalMethod.invoke(contextEntity);
+
+    if (collection == null) {
+      collection = createCollectionForMethod(originalMethod);
+    } else {
+      collection.clear();
+    }
+    return updateCollectionWithLinkedResources(collection, resources);
+  }
+
+  private <F> Collection<F> resolveCollectionLinkedResource(
+      CollectionModel<EntityModel<F>> resources, Method method) {
+    return updateCollectionWithLinkedResources(createCollectionForMethod(method), resources);
+  }
+
+  private <F> Collection<F> updateCollectionWithLinkedResources(
+      Collection<F> collection, CollectionModel<EntityModel<F>> resources) {
+    for (EntityModel<F> fResource : resources) {
+      collection.add(proxyFactory.create(fResource, restOperations));
+    }
+
+    return collection;
+  }
+
+  private <F> CollectionModel<EntityModel<F>> getLinkedResources(
+      URI associationResource, Class<F> linkedEntityType) {
+    return restOperations.getResources(associationResource, linkedEntityType);
+  }
+
+  private <F> Collection<F> createCollectionForMethod(Method method) {
+    return propertyValueFactory.createCollection(method.getReturnType());
+  }
 }

@@ -15,12 +15,11 @@
  */
 package uk.co.blackpepper.bowman;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public interface RestTemplateFactory {
 
-	RestTemplate create(ClientHttpRequestFactory clientHttpRequestFactory, ObjectMapper objectMapper);
+  RestTemplate create(ClientHttpRequestFactory clientHttpRequestFactory, ObjectMapper objectMapper);
 }

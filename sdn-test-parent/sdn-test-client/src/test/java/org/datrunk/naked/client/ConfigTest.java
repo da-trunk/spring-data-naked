@@ -11,14 +11,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
-@ComponentScan(basePackageClasses = { RepoClient.Factory.class })
-@Import({ Config.class })
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
+@ComponentScan(basePackageClasses = {RepoClient.Factory.class})
+@Import({Config.class})
 public class ConfigTest {
-    private final RepoClient<User, Integer> jobClient;
+  private final RepoClient<User, Integer> jobClient;
 
-    public ConfigTest(RepoClient.Factory repoClientFactory) {
-        jobClient = repoClientFactory.create(User.class, Integer.class);
-        assertThat(jobClient).isNotNull();
-    }
+  public ConfigTest(RepoClient.Factory repoClientFactory) {
+    jobClient = repoClientFactory.create(User.class, Integer.class);
+    assertThat(jobClient).isNotNull();
+  }
 }

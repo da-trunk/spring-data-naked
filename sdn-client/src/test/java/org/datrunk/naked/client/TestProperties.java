@@ -14,16 +14,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @SpringBootTest(classes = TestProperties.EmptyConfig.class, webEnvironment = WebEnvironment.NONE)
-@ExtendWith({ SpringExtension.class })
+@ExtendWith({SpringExtension.class})
 @ActiveProfiles("test")
 @EnableConfigurationProperties(RepoClient.Properties.class)
 public class TestProperties {
   @Configuration
-  static class EmptyConfig {
-  }
+  static class EmptyConfig {}
 
-  @Autowired
-  private Properties clientProperties;
+  @Autowired private Properties clientProperties;
 
   @Test
   public void testClientProperties() {

@@ -2,12 +2,13 @@ package org.datrunk.naked.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.List;
-
 import javax.sql.DataSource;
-
+import liquibase.exception.LiquibaseException;
+import lombok.extern.log4j.Log4j2;
 import org.datrunk.naked.client.container.TomcatTestContainer;
 import org.datrunk.naked.db.mysql.MySqlTestContainer;
 import org.datrunk.naked.entities.User;
@@ -36,18 +37,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.common.collect.ImmutableList;
-
-import liquibase.exception.LiquibaseException;
-import lombok.extern.log4j.Log4j2;
-
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ExtendWith({ SpringExtension.class })
+@ExtendWith({SpringExtension.class})
 @TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(initializers = { MySqlTestContainer.Factory.class, TomcatTestContainer.Factory.class }, classes = {
-    BatchUpdateTest.Config.class, RepoClient.Factory.class })
-@EnableConfigurationProperties({ DataSourceProperties.class, RepoClient.Properties.class })
+@ContextConfiguration(
+    initializers = {MySqlTestContainer.Factory.class, TomcatTestContainer.Factory.class},
+    classes = {BatchUpdateTest.Config.class, RepoClient.Factory.class})
+@EnableConfigurationProperties({DataSourceProperties.class, RepoClient.Properties.class})
 @ActiveProfiles("test")
 @Log4j2
 public class BatchUpdateTest {
@@ -74,17 +71,19 @@ public class BatchUpdateTest {
     }
 
     @Bean
-    public RestTemplate getRestTemplate(TomcatTestContainer server, RestTemplateBuilder restTemplateBuilder) {
-      RestTemplate restTemplate = restTemplateBuilder.rootUri(server.getBaseUri().toASCIIString())
-          .setConnectTimeout(Duration.ofSeconds(2))
-          .setReadTimeout(Duration.ofSeconds(2))
-          .build();
+    public RestTemplate getRestTemplate(
+        TomcatTestContainer server, RestTemplateBuilder restTemplateBuilder) {
+      RestTemplate restTemplate =
+          restTemplateBuilder
+              .rootUri(server.getBaseUri().toASCIIString())
+              .setConnectTimeout(Duration.ofSeconds(2))
+              .setReadTimeout(Duration.ofSeconds(2))
+              .build();
       return restTemplate;
     }
   }
 
-  @Autowired
-  RepoClient.Factory repoClientFactory;
+  @Autowired RepoClient.Factory repoClientFactory;
 
   RepoClient<User, Integer> client;
   UserRandomizer randomizer;
@@ -120,7 +119,8 @@ public class BatchUpdateTest {
   @Test
   void testPersist() throws Exception {
     client.setMaxSize(2);
-    List<User> expected = ImmutableList.of(randomizer.getRandomValue(), randomizer.getRandomValue());
+    List<User> expected =
+        ImmutableList.of(randomizer.getRandomValue(), randomizer.getRandomValue());
     log.info("expected = [{}]", expected);
     List<User> persisted = client.persist(expected.get(0));
     assertThat(persisted).isEmpty();

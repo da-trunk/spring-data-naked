@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.datrunk.naked.entities.bowman.annotation.RemoteResource;
 import org.datrunk.naked.entities.bowman.annotation.ResourceId;
 import org.junit.Before;
@@ -37,164 +36,167 @@ import org.springframework.hateoas.EntityModel;
 
 public class ClientTest {
 
-	@RemoteResource("/entities")
-	public static class Entity {
-		
-		private URI id;
-		
-		Entity() {
-		}
-		
-		Entity(URI id) {
-			this.id = id;
-		}
-		
-		@ResourceId
-		public URI getId() {
-			return id;
-		}
-	}
-	
-	private static final String BASE_URI = "http://www.example.com";
-	
-	private Client<Entity> client;
-	
-	private RestOperations restOperations;
+  @RemoteResource("/entities")
+  public static class Entity {
 
-	private ClientProxyFactory proxyFactory;
-	
-	@Before
-	public void setup() {
-		restOperations = mock(RestOperations.class);
-		proxyFactory = mock(ClientProxyFactory.class);
-		
-		Configuration config = Configuration.builder()
-				.setBaseUri(BASE_URI)
-				.build();
-		
-		client = new Client<>(Entity.class, config, restOperations, proxyFactory);
-	}
-	
-	@Test
-	public void getReturnsProxy() {
-		Entity expected = new Entity();
-		
-		EntityModel<Entity> resource = EntityModel.of(new Entity());
-		when(restOperations.getResource(URI.create(BASE_URI + "/entities"), Entity.class)).thenReturn(resource);
-		when(proxyFactory.create(resource, restOperations)).thenReturn(expected);
-		
-		Entity proxy = client.get();
-		
-		assertThat(proxy, is(expected));
-	}
-	
-	@Test
-	public void getReturnsNullWhenRestOperationsReturnsNull() {
-		when(restOperations.getResource(URI.create(BASE_URI + "/entities"), Entity.class)).thenReturn(null);
-		
-		Entity proxy = client.get();
-		
-		assertThat(proxy, is(nullValue()));
-	}
-	
-	@Test
-	public void getWithUriReturnsProxy() {
-		Entity expected = new Entity();
-		
-		EntityModel<Entity> resource = EntityModel.of(new Entity());
-		when(restOperations.getResource(URI.create("http://www.example.com/1"), Entity.class)).thenReturn(resource);
-		when(proxyFactory.create(resource, restOperations)).thenReturn(expected);
-		
-		Entity proxy = client.get(URI.create("http://www.example.com/1"));
-		
-		assertThat(proxy, is(expected));
-	}
-	
-	@Test
-	public void getWithUriReturnsNullWhenRestOperationsReturnsNull() {
-		when(restOperations.getResource(URI.create("http://www.example.com/1"), Entity.class)).thenReturn(null);
-		
-		Entity proxy = client.get(URI.create("http://www.example.com/1"));
-		
-		assertThat(proxy, is(nullValue()));
-	}
+    private URI id;
 
-	@Test
-	public void patchReturnsProxy() {
-		Entity expected = new Entity();
-		Map<String, String> patch = new HashMap<String, String>();
+    Entity() {}
 
-		EntityModel<Entity> resource = EntityModel.of(new Entity());
-		when(restOperations.patchForResource(URI.create("http://www.example.com/1"), patch, Entity.class))
-			.thenReturn(resource);
-		when(proxyFactory.create(resource, restOperations)).thenReturn(expected);
+    Entity(URI id) {
+      this.id = id;
+    }
 
-		Entity proxy = client.patch(URI.create("http://www.example.com/1"), patch);
+    @ResourceId
+    public URI getId() {
+      return id;
+    }
+  }
 
-		assertThat(proxy, is(expected));
-	}
-	
-	@Test
-	public void patchReturnsNullWhenRestOperationsReturnsNull() {
-		Map<String, String> patch = new HashMap<String, String>();
+  private static final String BASE_URI = "http://www.example.com";
 
-		when(restOperations.patchForResource(URI.create("http://www.example.com/1"), patch, Entity.class))
-			.thenReturn(null);
+  private Client<Entity> client;
 
-		Entity proxy = client.patch(URI.create("http://www.example.com/1"), patch);
+  private RestOperations restOperations;
 
-		assertThat(proxy, is(nullValue()));
-	}
+  private ClientProxyFactory proxyFactory;
 
-	@Test
-	public void getAllWithNoArgumentsReturnsProxyIterable() {
-		Entity expected = new Entity();
-		
-		EntityModel<Entity> resource = EntityModel.of(new Entity());
-		when(restOperations.getResources(URI.create(BASE_URI + "/entities"), Entity.class)).thenReturn(
-				CollectionModel.of(asList(resource)));
-		when(proxyFactory.create(resource, restOperations)).thenReturn(expected);
-		
-		Iterable<Entity> proxies = client.getAll();
-		
-		assertThat(proxies, contains(expected));
-	}
+  @Before
+  public void setup() {
+    restOperations = mock(RestOperations.class);
+    proxyFactory = mock(ClientProxyFactory.class);
 
-	@Test
-	public void postReturnsId() {
-		Entity entity = new Entity();
-		when(restOperations.postForId(URI.create(BASE_URI + "/entities"), entity)).thenReturn(
-				URI.create("http://www.example.com/1"));
-		
-		URI uri = client.post(entity);
-		
-		assertThat(uri, is(URI.create("http://www.example.com/1")));
-	}
-	
-	@Test
-	public void postSetsId() {
-		Entity entity = new Entity();
-		when(restOperations.postForId(URI.create(BASE_URI + "/entities"), entity)).thenReturn(
-				URI.create("http://www.example.com/1"));
-		
-		client.post(entity);
-		
-		assertThat(entity.getId(), is(URI.create("http://www.example.com/1")));
-	}
-	
-	@Test
-	public void putInvokesRestOperations() {
-		Entity entity = new Entity(URI.create("http://www.example.com/1"));
-		
-		client.put(entity);
-		
-		verify(restOperations).put(URI.create("http://www.example.com/1"), entity);
-	}
-	
-	@Test
-	public void deleteInvokesRestOperations() {
-		client.delete(URI.create("http://www.example.com/1"));
-		
-		verify(restOperations).delete(URI.create("http://www.example.com/1"));
-	}
+    Configuration config = Configuration.builder().setBaseUri(BASE_URI).build();
+
+    client = new Client<>(Entity.class, config, restOperations, proxyFactory);
+  }
+
+  @Test
+  public void getReturnsProxy() {
+    Entity expected = new Entity();
+
+    EntityModel<Entity> resource = EntityModel.of(new Entity());
+    when(restOperations.getResource(URI.create(BASE_URI + "/entities"), Entity.class))
+        .thenReturn(resource);
+    when(proxyFactory.create(resource, restOperations)).thenReturn(expected);
+
+    Entity proxy = client.get();
+
+    assertThat(proxy, is(expected));
+  }
+
+  @Test
+  public void getReturnsNullWhenRestOperationsReturnsNull() {
+    when(restOperations.getResource(URI.create(BASE_URI + "/entities"), Entity.class))
+        .thenReturn(null);
+
+    Entity proxy = client.get();
+
+    assertThat(proxy, is(nullValue()));
+  }
+
+  @Test
+  public void getWithUriReturnsProxy() {
+    Entity expected = new Entity();
+
+    EntityModel<Entity> resource = EntityModel.of(new Entity());
+    when(restOperations.getResource(URI.create("http://www.example.com/1"), Entity.class))
+        .thenReturn(resource);
+    when(proxyFactory.create(resource, restOperations)).thenReturn(expected);
+
+    Entity proxy = client.get(URI.create("http://www.example.com/1"));
+
+    assertThat(proxy, is(expected));
+  }
+
+  @Test
+  public void getWithUriReturnsNullWhenRestOperationsReturnsNull() {
+    when(restOperations.getResource(URI.create("http://www.example.com/1"), Entity.class))
+        .thenReturn(null);
+
+    Entity proxy = client.get(URI.create("http://www.example.com/1"));
+
+    assertThat(proxy, is(nullValue()));
+  }
+
+  @Test
+  public void patchReturnsProxy() {
+    Entity expected = new Entity();
+    Map<String, String> patch = new HashMap<String, String>();
+
+    EntityModel<Entity> resource = EntityModel.of(new Entity());
+    when(restOperations.patchForResource(
+            URI.create("http://www.example.com/1"), patch, Entity.class))
+        .thenReturn(resource);
+    when(proxyFactory.create(resource, restOperations)).thenReturn(expected);
+
+    Entity proxy = client.patch(URI.create("http://www.example.com/1"), patch);
+
+    assertThat(proxy, is(expected));
+  }
+
+  @Test
+  public void patchReturnsNullWhenRestOperationsReturnsNull() {
+    Map<String, String> patch = new HashMap<String, String>();
+
+    when(restOperations.patchForResource(
+            URI.create("http://www.example.com/1"), patch, Entity.class))
+        .thenReturn(null);
+
+    Entity proxy = client.patch(URI.create("http://www.example.com/1"), patch);
+
+    assertThat(proxy, is(nullValue()));
+  }
+
+  @Test
+  public void getAllWithNoArgumentsReturnsProxyIterable() {
+    Entity expected = new Entity();
+
+    EntityModel<Entity> resource = EntityModel.of(new Entity());
+    when(restOperations.getResources(URI.create(BASE_URI + "/entities"), Entity.class))
+        .thenReturn(CollectionModel.of(asList(resource)));
+    when(proxyFactory.create(resource, restOperations)).thenReturn(expected);
+
+    Iterable<Entity> proxies = client.getAll();
+
+    assertThat(proxies, contains(expected));
+  }
+
+  @Test
+  public void postReturnsId() {
+    Entity entity = new Entity();
+    when(restOperations.postForId(URI.create(BASE_URI + "/entities"), entity))
+        .thenReturn(URI.create("http://www.example.com/1"));
+
+    URI uri = client.post(entity);
+
+    assertThat(uri, is(URI.create("http://www.example.com/1")));
+  }
+
+  @Test
+  public void postSetsId() {
+    Entity entity = new Entity();
+    when(restOperations.postForId(URI.create(BASE_URI + "/entities"), entity))
+        .thenReturn(URI.create("http://www.example.com/1"));
+
+    client.post(entity);
+
+    assertThat(entity.getId(), is(URI.create("http://www.example.com/1")));
+  }
+
+  @Test
+  public void putInvokesRestOperations() {
+    Entity entity = new Entity(URI.create("http://www.example.com/1"));
+
+    client.put(entity);
+
+    verify(restOperations).put(URI.create("http://www.example.com/1"), entity);
+  }
+
+  @Test
+  public void deleteInvokesRestOperations() {
+    client.delete(URI.create("http://www.example.com/1"));
+
+    verify(restOperations).delete(URI.create("http://www.example.com/1"));
+  }
 }

@@ -18,6 +18,6 @@ package uk.co.blackpepper.bowman;
 import org.springframework.hateoas.EntityModel;
 
 public interface ClientProxyFactory {
-	
-	<T> T create(EntityModel<T> resource, RestOperations restOperations);
+
+  <T> T create(EntityModel<T> resource, RestOperations restOperations);
 }

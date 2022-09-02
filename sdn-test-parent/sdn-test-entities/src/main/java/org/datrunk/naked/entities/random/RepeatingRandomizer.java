@@ -17,7 +17,9 @@ public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
 
   private UnaryOperator<T> updateFn = UnaryOperator.identity();
 
-  /** @param maxSize the maximum number of distinct objects this Randomizer can generate. */
+  /**
+   * @param maxSize the maximum number of distinct objects this Randomizer can generate.
+   */
   protected RepeatingRandomizer(int maxSize) {
     super(0);
     this.maxSize = maxSize;

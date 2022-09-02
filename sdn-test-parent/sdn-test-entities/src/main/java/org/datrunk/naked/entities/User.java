@@ -1,6 +1,5 @@
 package org.datrunk.naked.entities;
 
-
 import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;

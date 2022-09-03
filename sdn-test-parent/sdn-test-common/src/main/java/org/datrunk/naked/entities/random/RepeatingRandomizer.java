@@ -1,12 +1,12 @@
 package org.datrunk.naked.entities.random;
 
 import com.github.javafaker.Faker;
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
   public static final int MAX_DISTINCT_ATTEMPTS = 100;
@@ -17,9 +17,7 @@ public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
 
   private UnaryOperator<T> updateFn = UnaryOperator.identity();
 
-  /**
-   * @param maxSize the maximum number of distinct objects this Randomizer can generate.
-   */
+  /** @param maxSize the maximum number of distinct objects this Randomizer can generate. */
   protected RepeatingRandomizer(int maxSize) {
     super(0);
     this.maxSize = maxSize;

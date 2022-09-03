@@ -128,8 +128,7 @@ public class CollectionDTOTest {
     public static Parent of(String id) {
       return new Parent(id);
     }
-  }
-  ;
+  };
 
   @Entity
   @Getter
@@ -156,8 +155,7 @@ public class CollectionDTOTest {
     public static Child of(String id) {
       return new Child(id);
     }
-  }
-  ;
+  };
 
   @Test
   public void testDeserializationWithTypeRef() throws JsonProcessingException {

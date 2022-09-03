@@ -2,19 +2,18 @@ package org.datrunk.naked.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableList;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.List;
+
 import javax.sql.DataSource;
-import liquibase.exception.LiquibaseException;
-import lombok.extern.log4j.Log4j2;
+
 import org.datrunk.naked.client.container.TomcatTestContainer;
 import org.datrunk.naked.db.mysql.MySqlTestContainer;
 import org.datrunk.naked.entities.User;
-import org.datrunk.naked.entities.UserRandomizer;
 import org.datrunk.naked.entities.random.Randomizer;
 import org.datrunk.naked.entities.random.Randomizer.Exception;
+import org.datrunk.naked.entities.random.UserRandomizer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -36,6 +35,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.common.collect.ImmutableList;
+
+import liquibase.exception.LiquibaseException;
+import lombok.extern.log4j.Log4j2;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ExtendWith({SpringExtension.class})

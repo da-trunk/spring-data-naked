@@ -13,10 +13,9 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sdn-entities</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>com.github.javafaker</groupId>
-			<artifactId>javafaker</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>sdn-test-common</artifactId>
 		</dependency>
 
 		<dependency>

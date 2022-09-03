@@ -50,36 +50,31 @@ jobs:
         server-username: GITHUB_USER
         server-password: GITHUB_TOKEN
 
+    - name: Delete previous snapshot releases
+      uses: smartsquaregmbh/delete-old-packages@v0.5.0
+      with:
+        keep: 1
+        #version-pattern: "^\\d+\\.\\d+(\\.\\d+)?-\\d{8}\\.\\d+-\\d+$"
+        names: |
+          sdn-parent
+          sdn-server
+          sdn-client
+          bowman-client
+          sdn-entities
+          sdn-test-parent
+          sdn-test-server
+          sdn-test-common
+          sdn-test-client
+          sdn-test-db-parent
+          sdn-test-db-common
+          sdn-test-db-mysql
+          sdn-test-db-postgres
+          sdn-test-db-oracle
+          sdn-test-db-h2
+
     - name: Publish SNAPSHOT to GitHub Packages from settings.xml
       run: mvn -B -Pgithub deploy -DskipTests
       env:
         GITHUB_USER: ${{ secrets.GIT_USER }}
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 
-  delete-snapshots:
-    needs: build 
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    strategy:
-      matrix:
-        package-name: [ 'io.github.da-trunk.naked.sdn-parent', 'io.github.da-trunk.naked.sdn-server', 'io.github.da-trunk.naked.sdn-client', 'io.github.da-trunk.naked.bowman-client', 'io.github.da-trunk.naked.sdn-entities', 'io.github.da-trunk.naked.sdn-test-parent', 'io.github.da-trunk.naked.sdn-test-server', 'io.github.da-trunk.naked.sdn-test-common', 'io.github.da-trunk.naked.sdn-test-client', 'io.github.da-trunk.naked.sdn-test-db-parent', 'io.github.da-trunk.naked.sdn-test-db-common', 'io.github.da-trunk.naked.sdn-test-db-mysql', 'io.github.da-trunk.naked.sdn-test-db-postgres', 'io.github.da-trunk.naked.sdn-test-db-oracle', 'io.github.da-trunk.naked.sdn-test-db-h2' ]
-
-    steps:
-    - uses: actions/checkout@v3
- 
-    - name: Set up settings.xml for GitHub Packages
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'adopt'
-        java-version: '8'
-        server-id: 'github'
-        server-username: GITHUB_USER
-        server-password: GITHUB_TOKEN
-        
-    - uses: actions/delete-package-versions@v3
-      with: 
-        package-name: ${{ matrix.package-name }}
-        min-versions-to-keep: 1
-        delete-only-pre-release-versions: "true"        

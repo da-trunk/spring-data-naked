@@ -7,5 +7,4 @@ public interface EntityCollection<T> extends Serializable {
   List<T> getEntities();
 
   void addEntity(T entity);
-}
-;
+};

@@ -51,8 +51,7 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
   private final Function<T, Object> naturalIdRetrievalFn;
 
   @ConfigurationProperties("client.repo")
-  public static class Properties extends ClientProperties {}
-  ;
+  public static class Properties extends ClientProperties {};
 
   @Component
   public static class Factory {

@@ -36,8 +36,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface RemoteResource {
 
-  /**
-   * @return the collection resource path, relative to the client base URI.
-   */
+  /** @return the collection resource path, relative to the client base URI. */
   String value();
 }

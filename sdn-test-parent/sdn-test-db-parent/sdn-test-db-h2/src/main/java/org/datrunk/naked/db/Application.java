@@ -14,6 +14,7 @@ public class Application {
 
   @Autowired private JdbcTemplate jdbcTemplate;
 
+  @SuppressWarnings("resource")
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
   }
@@ -23,6 +24,6 @@ public class Application {
 
   @Bean(initMethod = "start", destroyMethod = "stop")
   public Server inMemoryH2DatabaseServer() throws SQLException {
-    return Server.createTcpServer("-ifNotExists", "-tcp", "-tcpPort", "9091");
+    return Server.createTcpServer("-ifNotExists", "-tcp", "-tcpPort", "9091", "-tcpAllowOthers");
   }
 }

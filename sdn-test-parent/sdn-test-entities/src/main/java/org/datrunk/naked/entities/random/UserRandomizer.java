@@ -1,8 +1,8 @@
-package org.datrunk.naked.entities;
+package org.datrunk.naked.entities.random;
 
 import com.github.javafaker.Name;
-import org.datrunk.naked.entities.random.Randomizer;
-import org.datrunk.naked.entities.random.RepeatingRandomizer;
+import org.datrunk.naked.entities.Role;
+import org.datrunk.naked.entities.User;
 
 public class UserRandomizer extends RepeatingRandomizer<User> {
   private RepeatingRandomizer<Role> roleRandomizer;

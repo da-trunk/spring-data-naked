@@ -92,8 +92,7 @@ public class SimpleCollectionDTOTest {
       this.id = id;
       this.children = new ArrayList<>();
     }
-  }
-  ;
+  };
 
   @TestMarker
   @Getter
@@ -114,24 +113,21 @@ public class SimpleCollectionDTOTest {
       this.parent = parent;
       parent.getChildren().add(this);
     }
-  }
-  ;
+  };
 
   @ToString(callSuper = true)
   public static class Boy extends Child {
     public Boy(String id, Parent parent) {
       super(id, parent);
     }
-  }
-  ;
+  };
 
   @ToString(callSuper = true)
   public static class Girl extends Child {
     public Girl(String id, Parent parent) {
       super(id, parent);
     }
-  }
-  ;
+  };
 
   @Getter
   @Setter

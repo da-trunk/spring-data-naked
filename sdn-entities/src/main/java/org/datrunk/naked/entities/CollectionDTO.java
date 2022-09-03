@@ -74,5 +74,4 @@ public class CollectionDTO<T extends WithId> implements EntityCollection<T> {
   public Iterator<T> iterator() {
     return this.entities.iterator();
   }
-}
-;
+};

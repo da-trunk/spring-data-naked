@@ -1,12 +1,17 @@
 package org.datrunk.naked.db;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 import liquibase.Contexts;
@@ -233,8 +238,29 @@ public interface SpringTestDbContainer extends SpringTestContainer {
               "Cannot construct an instance of" + clazz.getName(), e);
         }
         if (props.getUrl() == null) {
-          instance.start();
-          props.setUrl(instance.getJdbcUrl());
+          List<String> errors =
+              Stream.of("database", "username", "password")
+                  .map(name -> "spring.datasource." + name)
+                  .filter(name -> !env.containsProperty(name))
+                  .map(
+                      name ->
+                          "Property "
+                              + name
+                              + " must be defined in the environment when spring.datasource.url is undefined")
+                  .collect(Collectors.toList());
+          if (!errors.isEmpty())
+            throw new IllegalArgumentException(errors.stream().collect(Collectors.joining("\n")));
+          try {
+            instance.start();
+            props.setUrl(instance.getJdbcUrl());
+          } catch (Exception e) {
+            log.catching(e);
+            throw e;
+          }
+          if (props.getUrl() == null) {
+            throw new IllegalArgumentException(
+                "The database started, but jdbcURL was not initialized");
+          }
         } else {
           instance.setJdbcUrl(props.getUrl());
           log.info("{} connecting to {}", clazz.getSimpleName(), instance.getJdbcUrl());

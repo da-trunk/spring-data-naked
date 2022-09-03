@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 import java.time.Duration;
+
 import javax.sql.DataSource;
-import liquibase.exception.LiquibaseException;
+
 import org.datrunk.naked.client.container.TomcatTestContainer;
 import org.datrunk.naked.db.jdbc.DataSourceWrapper;
 import org.datrunk.naked.db.mysql.MySqlTestContainer;
@@ -28,6 +29,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
+
+import liquibase.exception.LiquibaseException;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ExtendWith({SpringExtension.class})

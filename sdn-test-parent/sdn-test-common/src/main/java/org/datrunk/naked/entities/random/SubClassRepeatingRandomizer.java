@@ -2,9 +2,7 @@ package org.datrunk.naked.entities.random;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 
-@Getter
 public class SubClassRepeatingRandomizer<E> extends RepeatingRandomizer<E> {
   private final Map<String, Randomizer<? extends E>> randomizers;
 

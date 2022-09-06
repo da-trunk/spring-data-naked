@@ -1,0 +1,17 @@
+spring:
+  config:
+    import:  # imports mysql.yml and mysql-<profile>.yml after importing the properties in this file.  This gives precedence to properties defined in mysql-<profile>.yml 
+    - classpath:mysql.yml
+  datasource:
+    username: test
+    password: password
+    database: test
+    container.port: 3306
+    #url: jdbc:mysql://localhost:3306/test
+  liquibase:
+    enabled: false
+logging:
+  level:
+    root: warn
+    org.datrunk.naked: trace
+    com.mysql.cj.jdbc: trace

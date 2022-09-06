@@ -12,8 +12,8 @@
 	<modules>
 		<module>sdn-test-entities</module>
 		<module>sdn-test-common</module>
-		<module>sdn-test-server</module>
-		<module>sdn-test-client</module>
+		<module>sdn-test-server-tomcat</module>
+		<module>sdn-test-client-tomcat</module>
 		<module>sdn-test-db-parent</module>
 	</modules>
 </project>

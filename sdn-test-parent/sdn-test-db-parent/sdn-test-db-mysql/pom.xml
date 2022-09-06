@@ -7,6 +7,7 @@
 	</parent>
 	<artifactId>sdn-test-db-mysql</artifactId>
 	<properties>
+		<start-class>org.datrunk.naked.db.mysql.Application</start-class>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 		<liquibase.changeLogFile>migration_${maven.build.timestamp}.xml</liquibase.changeLogFile>
@@ -194,5 +195,22 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>${start-class}</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 </project>

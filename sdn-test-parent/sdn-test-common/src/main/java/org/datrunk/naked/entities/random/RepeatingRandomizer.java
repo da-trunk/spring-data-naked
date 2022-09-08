@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
   public static final int MAX_DISTINCT_ATTEMPTS = 100;
@@ -74,7 +73,7 @@ public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
     while (populatedBeans.size() < maxSize) {
       populatedBeans.add(getRandomValue());
     }
-    return ImmutableList.copyOf(populatedBeans);
+    return new ArrayList<>(populatedBeans);
   }
 
   /**

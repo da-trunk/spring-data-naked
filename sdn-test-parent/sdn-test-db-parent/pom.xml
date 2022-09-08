@@ -12,8 +12,8 @@
 	<modules>
 		<module>sdn-test-db-common</module>
 		<module>sdn-test-db-oracle</module>
-		<module>sdn-test-db-h2</module>
-		<module>sdn-test-db-postgres</module>
 		<module>sdn-test-db-mysql</module>
+		<!--<module>sdn-test-db-h2</module>
+		<module>sdn-test-db-postgres</module>-->
 	</modules>
 </project>

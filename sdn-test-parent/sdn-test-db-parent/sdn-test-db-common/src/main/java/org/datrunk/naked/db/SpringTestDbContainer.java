@@ -1,13 +1,13 @@
 package org.datrunk.naked.db;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.test.context.support.TestPropertySourceUtils;
+import org.springframework.core.env.MapPropertySource;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
@@ -280,8 +280,11 @@ public interface SpringTestDbContainer extends SpringTestContainer {
       ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
       if (!beanFactory.containsBean(clazz.getName())) {
         beanFactory.registerSingleton(clazz.getName(), instance);
-        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
-            ctx, "spring.datasource.url=" + instance.getJdbcUrl());
+        Map<String, Object> map = new HashMap<>();
+        map.put("spring.datasource.url", instance.getJdbcUrl());
+        env.getPropertySources().addFirst(new MapPropertySource("newmap", map));
+        //        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
+        //            ctx, "spring.datasource.url=" + instance.getJdbcUrl());
       }
     }
 

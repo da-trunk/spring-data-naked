@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
-@Import({Application.Config.class})
+@Import({ Application.Config.class })
 @EnableAutoConfiguration
 @EnableConfigurationProperties(DataSourceProperties.class)
 public class Application {
@@ -26,7 +26,8 @@ public class Application {
     }
   }
 
-  @Autowired private JdbcTemplate jdbcTemplate;
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
 
   @SuppressWarnings("resource")
   public static void main(String[] args) {
@@ -36,5 +37,7 @@ public class Application {
   }
 
   @PostConstruct
-  private void initDb() {}
+  private void initDb() {
+    assert (jdbcTemplate != null);
+  }
 }

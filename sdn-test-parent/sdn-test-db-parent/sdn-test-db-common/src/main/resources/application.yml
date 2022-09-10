@@ -1,0 +1,14 @@
+test:
+  containers:
+    db:
+      application:
+        build-dir: '@project.build.directory@'
+spring:
+  liquibase:
+    enabled: false
+    change-log: classpath:liquibase/changelog-test.xml
+    contexts: test
+    dropFirst: false
+logging:
+  level:
+    root: warn

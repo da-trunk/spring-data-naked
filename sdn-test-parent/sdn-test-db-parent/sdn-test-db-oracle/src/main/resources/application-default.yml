@@ -1,0 +1,20 @@
+spring:
+  config:
+    import: 
+    - classpath:oracle.yml
+  datasource:
+    username: test
+    password: password
+    database: test
+    #url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+    container.port: 1521
+  liquibase:
+    enabled: false    
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+logging:
+  level:
+    root: warn
+    org.datrunk.naked: trace

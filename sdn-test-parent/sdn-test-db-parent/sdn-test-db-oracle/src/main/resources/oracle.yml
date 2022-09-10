@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    container:
+      image: gvenzl/oracle-xe:21.3.0-slim-faststart
+      type: xe21
+      #port: 1521
+    #url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+    #username: test
+    #password: password
+    #database: test
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    database-platform: org.hibernate.dialect.Oracle12cDialect
+    properties.hibernate:
+      jdbc.time_zone: UTC

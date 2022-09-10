@@ -1,0 +1,46 @@
+application:
+  artifactId: '@project.artifactId@'
+  javaVersion: '@java.version@'
+  version: '@project.version@'
+  name: '@project.name@'
+spring:
+  main:
+    banner-mode: 'off'
+    allow-bean-definition-overriding: true
+  data:
+    rest:
+      base-path: /api
+      return-body-on-create: true
+      return-body-on-update: true
+      #default-media-type: application/JSON
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties.hibernate.jdbc.time_zone: UTC
+  jersey:
+    type: filter
+    # applicationPath: /service
+  datasource:
+  mvc.converters.preferred-json-mapper: jackson
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      write-dates-as-timestamps: false
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non-null
+logging:
+  sql:
+    enabled: false
+decorator:
+  datasource:
+    p6spy:
+      multiline: true
+      enable-logging: true
+      logging: sysout
+      log-format: '%(sql);'
+      timestamp-format: 'yyyy-MM-dd HH24:MI:SS'
+    enabled: true

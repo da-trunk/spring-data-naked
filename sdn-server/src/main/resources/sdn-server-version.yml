@@ -1,0 +1,7 @@
+application:
+  artifactId: '@project.artifactId@'
+  javaVersion: '@java.version@'
+  version: '@project.version@'
+  name: '@project.name@'
+  buildDir: '@project.build.directory@'
+  warName: '@project.artifactId@-@project.version@.war'

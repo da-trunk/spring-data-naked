@@ -1,0 +1,80 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on: 
+  workflow_dispatch:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main" ]
+   
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        java-version: [ '8' ]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'adopt'
+        cache: 'maven'
+        
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+      
+  publish-snapshots:
+    needs: build      
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v3
+ 
+    - name: Set up settings.xml for GitHub Packages
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '8'
+        server-id: 'github'
+        server-username: GITHUB_USER
+        server-password: GITHUB_TOKEN
+
+    - name: Delete previous snapshot releases
+      uses: smartsquaregmbh/delete-old-packages@v0.5.0
+      with:
+        keep: 1
+        #version-pattern: "^\\d+\\.\\d+(\\.\\d+)?-\\d{8}\\.\\d+-\\d+$"
+        names: |
+          io.github.da-trunk.naked.sdn-parent
+          io.github.da-trunk.naked.sdn-server
+          io.github.da-trunk.naked.sdn-client
+          io.github.da-trunk.naked.bowman-client
+          io.github.da-trunk.naked.sdn-entities
+          io.github.da-trunk.naked.sdn-test-parent
+          io.github.da-trunk.naked.sdn-test-server
+          io.github.da-trunk.naked.sdn-test-common
+          io.github.da-trunk.naked.sdn-test-client
+          io.github.da-trunk.naked.sdn-test-db-parent
+          io.github.da-trunk.naked.sdn-test-db-common
+          io.github.da-trunk.naked.sdn-test-db-mysql
+          io.github.da-trunk.naked.sdn-test-db-postgres
+          io.github.da-trunk.naked.sdn-test-db-oracle
+          io.github.da-trunk.naked.sdn-test-db-h2
+
+#    - name: Publish SNAPSHOT to GitHub Packages from settings.xml
+#      run: mvn -B -Pgithub deploy -DskipTests
+#      env:
+#        GITHUB_USER: ${{ secrets.GIT_USER }}
+#        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+

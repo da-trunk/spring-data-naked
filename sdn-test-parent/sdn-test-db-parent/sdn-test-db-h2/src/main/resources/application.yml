@@ -1,0 +1,20 @@
+spring:
+  config:
+    import:
+    - classpath:h2.yml
+  liquibase:
+    enabled: false
+  datasource:
+    username: test
+    password: password
+    database: test        
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        trace: false 
+      web-allow-others: false
+server:
+  port: 9180
+      

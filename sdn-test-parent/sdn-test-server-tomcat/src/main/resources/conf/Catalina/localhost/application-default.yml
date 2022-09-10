@@ -1,0 +1,23 @@
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure.include: '*'
+  endpoint:
+    shutdown.enabled: true
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    # url: jdbc:oracle:thin:@db:1521/XE
+    url: jdbc:mysql://db:3306/test
+    username: test
+    password: password
+  application.admin.enabled: true
+  liquibase:
+    enabled: false
+logging:
+  level:
+    root: warn

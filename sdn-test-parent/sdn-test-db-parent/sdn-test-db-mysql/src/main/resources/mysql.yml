@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    container:
+      image: mysql:8.0.29
+      config: '@project.build.directory@/classes/mysql.cnf'
+      #port: 3306
+    #url: jdbc:mysql://localhost:3306/test
+    #username: test
+    #password: password
+    #database: test
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #hikari:
+      #auto-commit: false
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties.hibernate:
+      jdbc.time_zone: UTC
+      #globally_quoted_identifiers: false
+      #connection.provider_disables_autocommit: true
+
+      

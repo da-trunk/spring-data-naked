@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  test-database:
+    image: '?'
+    container_name: test-api
+    shm_size: '1g'
+    environment:
+      ORACLE_SID: oracle
+      ORACLE_PDB: oracle
+      ORACLE_PWD: password
+    ports:
+      - 1521:1521
+    healthcheck:
+       test: [ "CMD", "bash", "-c", "echo 'select 1 from dual;' | sqlplus -s db_test/password@//localhost:1521/XE"]
+       interval: 10s
+       timeout: 10s
+       retries: 60
+  test-api:
+    build:
+      context: .
+      dockerfile: target/test-classes/Dockerfile
+    container_name: tomcat
+    working_dir: /usr/local/tomcat
+    depends_on:
+      test-database:
+        condition: service_healthy
+    links:
+      - test-database
+    ports:
+      - 9080:8080    

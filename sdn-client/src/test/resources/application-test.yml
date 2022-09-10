@@ -1,0 +1,4 @@
+client.repo:
+  location: url
+  batch-path: batch/
+  retry-sleep-durations: [ 0 ]

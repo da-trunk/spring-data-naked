@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context path="ROOT"
+         debug="1"
+         reloadable="false"
+         crossContext="true">
+  <Environment name="spring.config.location" value="classpath:application.yml,file:/usr/local/tomcat/conf/Catalina/localhost/" type="java.lang.String"/>
+</Context>

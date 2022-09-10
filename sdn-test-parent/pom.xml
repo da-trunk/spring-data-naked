@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.github.da-trunk.naked</groupId>
+		<artifactId>sdn-parent</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>sdn-test-parent</artifactId>
+	<packaging>pom</packaging>
+	<modules>
+		<module>sdn-test-entities</module>
+		<module>sdn-test-common</module>
+		<module>sdn-test-server-tomcat</module>
+		<module>sdn-test-client-tomcat</module>
+		<module>sdn-test-db-parent</module>
+	</modules>
+</project>

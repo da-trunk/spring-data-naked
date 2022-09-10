@@ -48,9 +48,9 @@ public class ClientTest {
     @Bean
     DataSource dataSource(MySqlTestContainer db) throws LiquibaseException, SQLException {
       if (!initialized) {
-        //        db.updateAsSys("liquibase/mysql/init.xml");
-        //        db.update("liquibase/mysql/schema-update-versioned.xml");
-        //        db.update("liquibase/mysql/content/master.xml");
+        // db.updateAsSys("liquibase/mysql/init.xml");
+        // db.update("liquibase/mysql/schema-update-versioned.xml");
+        // db.update("liquibase/mysql/content/master.xml");
         initialized = true;
       }
       return db.getDataSource();

@@ -15,6 +15,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     properties.hibernate:
       jdbc.time_zone: UTC
+      #globally_quoted_identifiers: false
       #connection.provider_disables_autocommit: true
 
       

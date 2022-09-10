@@ -35,6 +35,11 @@ sqlplus test/test@//localhost/XEPDB1
     * search: `<changeSet[^>]*>(?s)\s+<drop\w+ ([^>]+?)>\s+<\/changeSet>\s+(?-s)`
     * replace:
     
+# Starting the image manually
+
+* `docker pull gvenzl/oracle-xe:21.3.0-slim-faststart`
+* `docker run -d --name db -p 1521:1521 --shm-size=1g -e ORACLE_PASSWORD=password -e ORACLE_PDB=XEPDB1 gvenzl/oracle-xe:21.3.0-slim-faststart`
+    
 # Building an XE image
 
   1. Install [docker for windows](https://docs.docker.com/docker-for-windows/install/)

@@ -38,35 +38,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot.version}</version>
-				<configuration>
-					<mainClass>${start-class}</mainClass>
-				</configuration>
+				<executions>
+					<execution>
+						<configuration>
+							<mainClass>${start-class}</mainClass>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.springframework.boot.experimental</groupId> <artifactId>spring-boot-thin-maven-plugin</artifactId> <version>${thin.version}</version>
-				<executions> <execution> Download the dependencies at build time <id>resolve</id> <goals> <goal>resolve</goal> </goals> <inherited>false</inherited>
-				</execution> </executions> </plugin> -->
 		</plugins>
 	</build>
-	<profiles>
-		<profile>
-			<id>thin-jar</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-						<dependencies>
-							<!-- The following enables the "thin jar" deployment option. -->
-							<dependency>
-								<groupId>org.springframework.boot.experimental</groupId>
-								<artifactId>spring-boot-thin-layout</artifactId>
-								<version>${thin.version}</version>
-							</dependency>
-						</dependencies>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

@@ -44,11 +44,11 @@ public class OracleTestContainer extends OracleContainer implements SpringTestDb
   public OracleTestContainer(final @Nonnull Environment environment) {
     super(getImageName(environment));
     init(this, environment, this::addFixedExposedPort);
-    withEnv("ORACLE_PWD", "password");
     type = Type.valueOf(environment.getProperty("spring.datasource.container.type"));
     switch (type) {
       case xe11:
         withSharedMemorySize(FileUtils.ONE_GB)
+            .withEnv("ORACLE_PWD", "password")
             .withEnv("ORACLE_SID", "oracle")
             .withEnv("ORACLE_PDB", "oracle")
             .withDatabaseName("XE")
@@ -56,14 +56,13 @@ public class OracleTestContainer extends OracleContainer implements SpringTestDb
         break;
       case xe18:
       case xe21:
-        //        final String tmpDir = getHostTempDir(type.name()).toAbsolutePath().toString();
+        // final String tmpDir =
+        // getHostTempDir(type.name()).toAbsolutePath().toString();
         this
             // .withEnv("ORACLE_PDB", "XEPDB1")
             .withEnv("ORACLE_PASSWORD", getPassword())
             // .withFileSystemBind(tmpDir, "/opt/oracle/oradata", BindMode.READ_WRITE)
             .waitingFor(new LogMessageWaitStrategy().withRegEx("DATABASE IS READY TO USE!\\n"))
-            //          .waitingFor(new LogMessageWaitStrategy().withRegEx("Completed: ALTER
-            // DATABASE OPEN\\s*"))
             .withStartupTimeout(
                 Duration.ofMinutes(5)); // necessary when building for the first time on the server
         break;
@@ -96,14 +95,16 @@ public class OracleTestContainer extends OracleContainer implements SpringTestDb
   }
 
   protected void createTestDb() {
-    //	  {
-    //	  String rootJdbcUrl = "jdbc:oracle:thin:" + "@" + getHost() + ":" + getOraclePort() + "/XE";
-    //	    final DriverManagerDataSource dataSource = new DriverManagerDataSource(rootJdbcUrl, "SYS
+    // {
+    // String rootJdbcUrl = "jdbc:oracle:thin:" + "@" + getHost() + ":" +
+    // getOraclePort() + "/XE";
+    // final DriverManagerDataSource dataSource = new
+    // DriverManagerDataSource(rootJdbcUrl, "SYS
     // AS SYSDBA",
-    //	            getPassword());
-    //	    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-    //	    jdbc.execute("alter system set COMPATIBLE='19.6.0' scope=spfile");
-    //	  }
+    // getPassword());
+    // final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    // jdbc.execute("alter system set COMPATIBLE='19.6.0' scope=spfile");
+    // }
     final DriverManagerDataSource dataSource =
         new DriverManagerDataSource(getJdbcUrl(), "SYSTEM", getPassword());
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);

@@ -10,12 +10,12 @@ There is not a lot of actual code in spring-data-rest.  Most of it is configurat
 
 ## Server Tests
 
-This currently only supports testing with Tomcat.  See [sdn-test-server](sdn-test-server/README.md).
+This currently only supports testing with Tomcat.  See [sdn-test-server-tomcat](sdn-test-server-tomcat/).
 
 ## Database Tests
 
-See [sdn-test-db-parent](sdn-test-db-parent/README.md)
+See [sdn-test-db-parent](sdn-test-db-parent/)
 
 ## Implementation
 
-Spring Data Naked tests [testcontainers](https://www.testcontainers.org/) and Spring to start and stop docker containers during JUnit5 tests.  See [sdn-test-common](sdn-test-common/README.md) and [sdn-test-db-common](sdn-test-db-parent/sdn-test-db-common/README.md) for useful classes when adding test functionality for new server and RDBMS implmentations.
+Spring Data Naked tests [testcontainers](https://www.testcontainers.org/) and Spring to start and stop docker containers during JUnit5 tests.  See [sdn-test-common](sdn-test-common/) and [sdn-test-db-common](sdn-test-db-parent/sdn-test-db-common/) for useful classes when adding test functionality for new server and RDBMS implmentations.

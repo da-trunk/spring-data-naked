@@ -33,6 +33,7 @@ public class User extends IdClass<Integer> {
   @Column(insertable = false, updatable = false)
   private Integer id;
 
+  @Column(nullable = false)
   @Nonnull private String firstName;
 
   private String lastName;

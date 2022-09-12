@@ -69,7 +69,7 @@ public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
     return result;
   }
 
-  public T getUniqueRandomValue() throws Exception {
+  public T getDistinctRandomValue() throws Exception {
     int i = 1;
     T result = get();
     while (isDuplicate(result)) {

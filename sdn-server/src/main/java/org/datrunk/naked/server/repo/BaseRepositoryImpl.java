@@ -68,11 +68,11 @@ public class BaseRepositoryImpl<T extends WithId<ID>, ID extends Serializable>
     entityManager.detach(entity);
   }
 
-  @Transactional
-  @Override
-  public void remove(T entity) {
-    entityManager.remove(entity);
-  }
+  //  @Transactional
+  //  @Override
+  //  public void remove(T entity) {
+  //    entityManager.remove(entity);
+  //  }
 
   /**
    * Query the DB and re-populate the entity before deleting it. Call this after updating tables

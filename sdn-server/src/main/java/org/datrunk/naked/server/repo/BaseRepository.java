@@ -47,7 +47,7 @@ public interface BaseRepository<T extends WithId<ID>, ID extends Serializable>
 
   Class<T> getDomainClass();
 
-  void remove(T entity);
+  //  void remove(T entity);
 
   /**
    * Saves the provided entity, then returns a new proxy after querying the DB. This is useful when

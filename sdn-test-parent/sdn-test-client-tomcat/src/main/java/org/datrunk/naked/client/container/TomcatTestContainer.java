@@ -6,6 +6,8 @@ import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,8 +21,9 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.test.context.support.TestPropertySourceUtils;
+import org.springframework.core.env.MapPropertySource;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.InternetProtocol;
@@ -153,7 +156,7 @@ public class TomcatTestContainer extends GenericContainer<TomcatTestContainer>
     }
 
     private static void create(ConfigurableApplicationContext ctx) {
-      final Environment env = ctx.getEnvironment();
+      final ConfigurableEnvironment env = ctx.getEnvironment();
       if (instance == null) {
         instance = new TomcatTestContainer(env);
         String url = env.getProperty("test.containers.tomcat.url");
@@ -175,8 +178,9 @@ public class TomcatTestContainer extends GenericContainer<TomcatTestContainer>
         beanFactory.registerSingleton(TomcatTestContainer.class.getName(), instance);
         assert (instance.getBaseUri() != null);
         assert (instance.getBaseUri().toASCIIString() != null);
-        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
-            ctx, "client.repo.location=" + instance.getBaseUri().toASCIIString());
+        Map<String, Object> map = new HashMap<>();
+        map.put("client.repo.location", instance.getBaseUri().toASCIIString());
+        env.getPropertySources().addFirst(new MapPropertySource("newmap", map));
       }
     }
 

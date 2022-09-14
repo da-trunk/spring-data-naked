@@ -248,8 +248,9 @@ public interface SpringTestDbContainer extends SpringTestContainer {
                               + name
                               + " must be defined in the environment when spring.datasource.url is undefined")
                   .collect(Collectors.toList());
-          if (!errors.isEmpty())
+          if (!errors.isEmpty()) {
             throw new IllegalArgumentException(errors.stream().collect(Collectors.joining("\n")));
+          }
           try {
             instance.start();
             props.setUrl(instance.getJdbcUrl());
@@ -283,8 +284,6 @@ public interface SpringTestDbContainer extends SpringTestContainer {
         Map<String, Object> map = new HashMap<>();
         map.put("spring.datasource.url", instance.getJdbcUrl());
         env.getPropertySources().addFirst(new MapPropertySource("newmap", map));
-        //        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
-        //            ctx, "spring.datasource.url=" + instance.getJdbcUrl());
       }
     }
 

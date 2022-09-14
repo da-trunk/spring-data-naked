@@ -34,7 +34,8 @@ public class User extends IdClass<Integer> {
   private Integer id;
 
   @Column(nullable = false)
-  @Nonnull private String firstName;
+  @Nonnull
+  private String firstName;
 
   private String lastName;
 

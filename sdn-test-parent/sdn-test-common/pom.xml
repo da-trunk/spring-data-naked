@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>io.github.da-trunk.naked</groupId>
 		<artifactId>sdn-test-parent</artifactId>
-		<version>0.1.1-SNAPSHOT</version>
+		<version>0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>sdn-test-common</artifactId>
 	<properties>

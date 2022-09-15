@@ -72,9 +72,9 @@ jobs:
           io.github.da-trunk.naked.sdn-test-db-oracle
           io.github.da-trunk.naked.sdn-test-db-h2
 
-#    - name: Publish SNAPSHOT to GitHub Packages from settings.xml
-#      run: mvn -B -Pgithub deploy -DskipTests
-#      env:
-#        GITHUB_USER: ${{ secrets.GIT_USER }}
-#        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+    - name: Publish SNAPSHOT to GitHub Packages from settings.xml
+      run: mvn -B -Pgithub deploy -DskipTests
+      env:
+        GITHUB_USER: ${{ secrets.GIT_USER }}
+        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 

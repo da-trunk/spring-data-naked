@@ -23,10 +23,10 @@ public abstract class UniqueRandomizer<T> extends AbstractRandomizer<T> {
   }
 
   @Override
-  protected abstract T get();
+  protected abstract T get() throws Randomizer.Exception;
 
   @Override
-  public final T getRandomValue() {
+  public final T getRandomValue() throws Randomizer.Exception {
     for (int i = 0; i < RepeatingRandomizer.MAX_DISTINCT_ATTEMPTS; i++) {
       T result = get();
       assert (result != null);

@@ -14,7 +14,7 @@ public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
   private final boolean filterDuplicates = true;
   private final ArrayList<T> populatedBeans;
 
-  private UnaryOperator<T> updateFn = UnaryOperator.identity();
+  protected UnaryOperator<T> updateFn = UnaryOperator.identity();
 
   /** @param maxSize the maximum number of distinct objects this Randomizer can generate. */
   protected RepeatingRandomizer(int maxSize) {
@@ -66,6 +66,23 @@ public abstract class RepeatingRandomizer<T> extends AbstractRandomizer<T> {
     } else {
       result = populatedBeans.get(index);
     }
+    return result;
+  }
+
+  public T getDistinctRandomValue() throws Exception {
+    int i = 1;
+    T result = get();
+    while (isDuplicate(result)) {
+      if (i >= MAX_DISTINCT_ATTEMPTS) {
+        throw new IllegalStateException(
+            String.format(
+                "%s generated %d duplicates in a row.  Is it able to generate more than %d distinct values?",
+                getClass().getSimpleName(), MAX_DISTINCT_ATTEMPTS, i));
+      }
+      result = get();
+      i++;
+    }
+    result = updateFn.apply(result);
     return result;
   }
 

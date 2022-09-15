@@ -1,10 +1,9 @@
 package org.datrunk.naked.entities.random;
 
+import com.github.javafaker.Faker;
 import java.util.Locale;
 import java.util.Random;
 import java.util.stream.Stream;
-
-import com.github.javafaker.Faker;
 
 public abstract class AbstractRandomizer<T> implements Randomizer<T> {
   protected final Random random;
@@ -27,12 +26,13 @@ public abstract class AbstractRandomizer<T> implements Randomizer<T> {
   }
 
   public Stream<T> stream() {
-    return Stream.generate(() -> {
-      try {
-        return getRandomValue();
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    });
+    return Stream.generate(
+        () -> {
+          try {
+            return getRandomValue();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 }

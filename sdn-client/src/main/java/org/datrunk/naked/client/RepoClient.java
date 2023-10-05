@@ -170,7 +170,7 @@ public class RepoClient<T extends IdClass<ID>, ID> extends FunctionalClient {
   }
 
   public T get(ID id) {
-    URI uri = getBaseURIBuilder().path(id.toString()).build().toUri();
+    URI uri = getBaseURIBuilder().path(id.toString()).build().toUri().normalize();
     return client.get(uri);
   }
 

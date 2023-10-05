@@ -35,7 +35,7 @@ class JsonClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
       HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
     HttpRequestWrapper wrapped = new HttpRequestWrapper(request);
     LOGGER.debug(
-        "{} {}: {}",
+        "{} {} {}",
         wrapped.getMethodValue(),
         wrapped.getURI().toString(),
         wrapped.getRequest().toString());
